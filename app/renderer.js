@@ -81,8 +81,14 @@ async function fadeOutHelper() {
 }
 
 // 送信処理
+// 送信処理
+sendBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+sendBtn.addEventListener('mouseup', (e) => e.stopPropagation());
+
 sendBtn.addEventListener('click', async (e) => {
     e.stopPropagation();
+    // 念のためフォーカスを戻す（フォーカス外れによる誤動作防止）
+    userInput.focus();
     const question = userInput.value.trim();
     if (!question) return;
 

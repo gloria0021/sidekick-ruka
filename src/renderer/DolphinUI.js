@@ -8,6 +8,7 @@ class DolphinUI {
         this.startX = 0;
         this.startY = 0;
         this.isBalloonOpen = false;
+        this.isPendingClick = false;
 
         this.setupEvents();
     }
@@ -16,6 +17,10 @@ class DolphinUI {
         this.character.addEventListener('mousedown', (e) => this.onMouseDown(e));
         window.addEventListener('mousemove', (e) => this.onMouseMove(e));
         window.addEventListener('mouseup', () => this.onMouseUp());
+
+        // 吹き出し内でのクリックが背後のwindowに伝わらないようにする
+        this.balloon.addEventListener('mousedown', (e) => e.stopPropagation());
+        this.balloon.addEventListener('mouseup', (e) => e.stopPropagation());
 
         // Mouse Ignore Handling
         [this.character, this.balloon].forEach(el => {
@@ -35,9 +40,11 @@ class DolphinUI {
     onMouseDown(e) {
         this.startX = e.screenX;
         this.startY = e.screenY;
+        this.isPendingClick = true;
 
         this.longPressTimer = setTimeout(() => {
             this.isDragging = true;
+            this.isPendingClick = false;
             this.character.classList.add('long-press');
             this.closeBalloon();
         }, 1000);
@@ -61,9 +68,12 @@ class DolphinUI {
             this.character.classList.remove('long-press');
             this.electronAPI.setIgnoreMouse(true);
             this.savePosition();
-        } else {
+        } else if (this.isPendingClick) {
+            // ドラッグに移行せず、かつキャラクターの上でmousedownしていた場合のみ実行
             this.toggleBalloon();
         }
+
+        this.isPendingClick = false;
     }
 
     async savePosition() {
