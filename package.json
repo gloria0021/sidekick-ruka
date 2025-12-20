@@ -1,0 +1,40 @@
+{
+  "name": "sidekick-ruka",
+  "version": "1.0.0",
+  "main": "main.js",
+  "author": "re-sidekick author",
+  "license": "ISC",
+  "description": "AI Dolphin Assistant 'Luka'",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "build": {
+    "appId": "com.sidekick-ruka.app",
+    "productName": "sidekick-ruka",
+    "win": {
+      "target": "nsis",
+      "icon": "app/assets/dolphin.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!dist/*"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12"
+  },
+  "dependencies": {
+    "@google/genai": "^1.34.0",
+    "@google/generative-ai": "^0.24.1"
+  }
+}

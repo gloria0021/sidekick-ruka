@@ -1,0 +1,10 @@
+module.exports = {
+    WINDOW_WIDTH: 400,
+    WINDOW_HEIGHT: 500,
+    BALLOON_OFFSET_BOTTOM: 184,
+    PRICE_PER_1M_INPUT: 0.50,
+    PRICE_PER_1M_OUTPUT: 3.00,
+    DEFAULT_EXCHANGE_RATE: 154,
+    MODEL_NAME: 'gemini-3-flash-preview',
+    CHARACTER_NAME: 'ルカ'
+};

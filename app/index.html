@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div id="container">
+    <div id="balloon">
+      <div id="response">
+        デスクトップからこんにちは！🐬<br>
+        お困りのことがあればいつでも教えてくださいね。
+      </div>
+      <div class="input-area">
+        <textarea id="user-input" placeholder="ヘルプを求める..." rows="1"></textarea>
+        <button id="send-btn">ヘルプ！</button>
+      </div>
+      <div id="cost-area">推定コスト: $0.000000</div>
+      <!-- APIキー設定モーダル -->
+      <div id="api-key-modal" class="modal">
+        <div class="modal-content">
+          <h3>魂を錬成 (APIキー設定)</h3>
+          <input type="password" id="api-key-input" placeholder="Google Gemini API Key">
+          <div class="modal-buttons">
+            <button id="api-key-save">保存</button>
+            <button id="api-key-cancel">閉じる</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="character-wrapper">
+      <img id="character" src="assets/dolphin.png" alt="Dolphin">
+    </div>
+  </div>
+  <script src="../src/renderer/CostManager.js"></script>
+  <script src="../src/renderer/DolphinUI.js"></script>
+  <script src="renderer.js"></script>
+</body>
+
+</html>
