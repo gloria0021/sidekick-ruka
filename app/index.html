@@ -17,10 +17,20 @@
         お困りのことがあればいつでも教えてくださいね。
       </div>
       <div class="input-area">
-        <textarea id="user-input" placeholder="ヘルプを求める..." rows="1"></textarea>
-        <button id="send-btn">ヘルプ！</button>
+        <div class="input-row">
+          <textarea id="user-input" placeholder="ヘルプを求める..." rows="1"></textarea>
+          <button id="send-btn">ヘルプ！</button>
+        </div>
       </div>
-      <div id="cost-area">推定コスト: $0.000000</div>
+      <div class="footer-area">
+        <div id="cost-area">
+          <label id="screen-mode-container">
+            <input type="checkbox" id="screen-mode-check">
+            <span>画面添付</span>
+          </label>
+          <span id="cost-text">相談料: 約0.00円 / 総額: 約0.00円</span>
+        </div>
+      </div>
       <!-- APIキー設定モーダル -->
       <div id="api-key-modal" class="modal">
         <div class="modal-content">

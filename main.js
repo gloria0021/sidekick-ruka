@@ -53,7 +53,7 @@ ipcMain.handle('get-exchange-rate', async () => {
         const data = await response.json();
         return {
             rate: data.rates.JPY,
-            time: new Date().toLocaleString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+            time: new Date().toLocaleString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(/-/g, '/')
         };
     } catch (err) {
         console.error("Exchange Rate Error:", err);

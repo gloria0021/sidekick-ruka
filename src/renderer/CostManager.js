@@ -42,8 +42,7 @@ class CostManager {
         const sessionJPY = sessionCostUSD * this.exchangeRate;
 
         return `
-            会話コスト: $${sessionCostUSD.toFixed(6)} (約${sessionJPY.toFixed(2)}円)<br>
-            累計推定コスト: $${this.totalUSD.toFixed(6)} (約${totalJPY.toFixed(2)}円)<br>
+            相談料: 約${sessionJPY.toFixed(2)}円 / 総額: 約${totalJPY.toFixed(2)}円<br>
             (1$ = ${this.exchangeRate.toFixed(0)}円 ${this.rateTime})
         `;
     }

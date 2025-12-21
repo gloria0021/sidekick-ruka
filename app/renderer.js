@@ -20,9 +20,10 @@ const apiKeySave = document.getElementById('api-key-save');
 const apiKeyCancel = document.getElementById('api-key-cancel');
 
 // 初期表示
-costArea.innerHTML = costManager.getFormattedDisplay();
+const costText = document.getElementById('cost-text');
+costText.innerHTML = costManager.getFormattedDisplay();
 costManager.updateExchangeRate(window.electronAPI).then(() => {
-    costArea.innerHTML = costManager.getFormattedDisplay();
+    costText.innerHTML = costManager.getFormattedDisplay();
 });
 
 // IPCイベントハンドリング
@@ -80,17 +81,15 @@ async function fadeOutHelper() {
     window.electronAPI.closeApp();
 }
 
-// 送信処理
-// 送信処理
-sendBtn.addEventListener('mousedown', (e) => e.stopPropagation());
-sendBtn.addEventListener('mouseup', (e) => e.stopPropagation());
+const screenCheck = document.getElementById('screen-mode-check');
 
-sendBtn.addEventListener('click', async (e) => {
-    e.stopPropagation();
-    // 念のためフォーカスを戻す（フォーカス外れによる誤動作防止）
+// 送信共通処理
+async function sendRequest() {
     userInput.focus();
     const question = userInput.value.trim();
-    if (!question) return;
+    const withScreen = screenCheck.checked;
+
+    if (!question && !withScreen) return;
 
     const apiKey = getApiKey();
     if (!apiKey) {
@@ -100,17 +99,18 @@ sendBtn.addEventListener('click', async (e) => {
 
     responseArea.innerHTML = "思考中...🐬💭";
     userInput.value = "";
+    userInput.style.height = 'auto';
 
     try {
         let base64Data = null;
-        if (question.includes("画面")) {
+        if (withScreen) {
             responseArea.innerHTML = "画面を確認中...🐬💭";
             const screenshot = await window.electronAPI.captureScreen();
             base64Data = screenshot.split(',')[1];
             responseArea.innerHTML = "画像から思考中...🐬🖼️💭";
         }
 
-        const result = await window.electronAPI.generateAIResponse(apiKey, question, base64Data);
+        const result = await window.electronAPI.generateAIResponse(apiKey, question || "この画面について教えてください", base64Data);
 
         if (result.error) throw new Error(result.error);
 
@@ -118,15 +118,31 @@ sendBtn.addEventListener('click', async (e) => {
             await costManager.updateExchangeRate(window.electronAPI);
             const sessionCost = costManager.calculateSessionCost(result.usage);
             costManager.addCost(sessionCost);
-            costArea.innerHTML = costManager.getFormattedDisplay(sessionCost);
+            costText.innerHTML = costManager.getFormattedDisplay(sessionCost);
         }
 
-        responseArea.innerHTML = result.text.replace(/\n/g, '<br>');
+        const displayQuestion = withScreen ? `画面分析: ${question || "説明して"}` : question;
+        const questionHtml = `<div class="user-question"><strong>Q:</strong> ${displayQuestion.replace(/\n/g, '<br>')}</div>`;
+        const answerHtml = `<div>${result.text.replace(/\n/g, '<br>')}</div>`;
+        responseArea.innerHTML = questionHtml + answerHtml;
+
+        // モードリセット
+        screenCheck.checked = false;
+
+        responseArea.scrollTop = responseArea.scrollHeight;
 
     } catch (error) {
         console.error("Renderer Error:", error);
         responseArea.innerHTML = `エラー発生...🐬💦<br><span style="color:red; font-size:11px;">${error.message}</span>`;
     }
+}
+
+// 送信ボタン
+sendBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+sendBtn.addEventListener('mouseup', (e) => e.stopPropagation());
+sendBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sendRequest();
 });
 
 // 入力エリア自動調整
@@ -140,7 +156,7 @@ userInput.addEventListener('input', () => {
 userInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        sendBtn.click();
+        sendRequest();
     }
 });
 
