@@ -330,7 +330,13 @@ body {
 
 #character.long-press {
     transform: scale(1.1);
-    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.2));
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.2)) brightness(1.1);
+}
+
+#character.dragging {
+    opacity: 0.6;
+    transform: scale(1.05);
+    cursor: grabbing;
 }
 
 #character:active {

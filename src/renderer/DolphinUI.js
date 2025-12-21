@@ -39,6 +39,7 @@ class DolphinUI {
     }
 
     onMouseDown(e) {
+        e.preventDefault(); // ブラウザのデフォルトのドラッグ(画像コピーなど)を防止
         this.startX = e.screenX;
         this.startY = e.screenY;
         this.isPendingClick = true;
@@ -46,7 +47,7 @@ class DolphinUI {
         this.longPressTimer = setTimeout(() => {
             this.isDragging = true;
             this.isPendingClick = false;
-            this.character.classList.add('long-press');
+            this.character.classList.add('long-press', 'dragging');
             this.closeBalloon();
         }, 1000);
     }
@@ -66,7 +67,7 @@ class DolphinUI {
 
         if (this.isDragging) {
             this.isDragging = false;
-            this.character.classList.remove('long-press');
+            this.character.classList.remove('long-press', 'dragging');
             this.electronAPI.setIgnoreMouse(true);
             this.savePosition();
         } else if (this.isPendingClick) {
