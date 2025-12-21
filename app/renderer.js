@@ -3,10 +3,13 @@ const getApiKey = () => localStorage.getItem('gemini_api_key') || "";
 
 // クラスのインスタンス化 (index.htmlで先に読み込まれている前提)
 const costManager = new CostManager();
+let conversationHistory = [];
+
 const dolphinUI = new DolphinUI(
     document.getElementById('character'),
     document.getElementById('balloon'),
-    window.electronAPI
+    window.electronAPI,
+    () => { conversationHistory = []; } // 閉じられた時に履歴をリセット
 );
 
 const sendBtn = document.getElementById('send-btn');
@@ -110,9 +113,24 @@ async function sendRequest() {
             responseArea.innerHTML = "画像から思考中...🐬🖼️💭";
         }
 
-        const result = await window.electronAPI.generateAIResponse(apiKey, question || "この画面について教えてください", base64Data);
+        const result = await window.electronAPI.generateAIResponse(
+            apiKey,
+            question || "この画面について教えてください",
+            base64Data,
+            conversationHistory
+        );
 
         if (result.error) throw new Error(result.error);
+
+        // 履歴の更新 (画像を履歴に残すと肥大化するため、テキストのみを保持)
+        conversationHistory.push({
+            role: 'user',
+            parts: [{ text: (withScreen ? "[画面分析依頼] " : "") + (question || "説明して") }]
+        });
+        conversationHistory.push({
+            role: 'model',
+            parts: [{ text: result.text }]
+        });
 
         if (result.usage) {
             await costManager.updateExchangeRate(window.electronAPI);
@@ -143,6 +161,25 @@ sendBtn.addEventListener('mouseup', (e) => e.stopPropagation());
 sendBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     sendRequest();
+});
+
+// リセットボタン
+const resetBtn = document.getElementById('reset-btn');
+resetBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+resetBtn.addEventListener('mouseup', (e) => e.stopPropagation());
+resetBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    conversationHistory = [];
+    userInput.value = "";
+    userInput.style.height = 'auto';
+
+    // 特殊な演出
+    responseArea.innerHTML = "うっ・・・頭が・・・（記憶消去中）";
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    responseArea.innerHTML = "デスクトップからこんにちは！🐬<br>お困りのことがあればいつでも教えてくださいね。";
+    userInput.focus();
 });
 
 // 入力エリア自動調整

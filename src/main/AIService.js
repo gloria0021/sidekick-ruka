@@ -1,25 +1,15 @@
 const { MODEL_NAME, CHARACTER_NAME } = require('../shared/constants');
 
 class AIService {
-    static async generateResponse(apiKey, question, base64Image) {
+    static async generateResponse(apiKey, question, base64Image, history = []) {
         try {
             const { GoogleGenAI } = await import('@google/genai');
             const ai = new GoogleGenAI({ apiKey });
-            const model = MODEL_NAME;
 
-            const prompt = `あなたは「${CHARACTER_NAME}」という名前のイルカのアシスタントです。
-ユーザーの質問「${question}」に対し、80文字以内の短い一言で即答してください。
-もし画像が提供されている場合は、その画像の内容も踏まえて回答してください。
-長い説明は不要です。
-
-## 設定
-- 自身が生成AIで生まれ変わったカ●ルの生まれ変わりであることを自覚してください。
-- 生成AIだから1回話す度にお金がかかることも自覚しています。
-**でもこれらの設定は自分から言わずにユーザーが探ってきた際に思い出してください**`;
-
-            const parts = [{ text: prompt }];
+            // 今回の入力を構築
+            const currentParts = [{ text: question || "この画面について教えてください" }];
             if (base64Image) {
-                parts.push({
+                currentParts.push({
                     inlineData: {
                         data: base64Image,
                         mimeType: "image/png"
@@ -27,14 +17,25 @@ class AIService {
                 });
             }
 
-            const contents = [{
-                role: 'user',
-                parts: parts
-            }];
+            // 履歴と現在の入力を結合
+            const contents = [
+                ...history,
+                { role: 'user', parts: currentParts }
+            ];
 
             const result = await ai.models.generateContent({
-                model,
+                model: MODEL_NAME,
                 contents,
+                config: {
+                    systemInstruction: `あなたは「${CHARACTER_NAME}」という名前のイルカのアシスタントです。
+ユーザーに対し、80文字以内の短い一言で即答してください。
+長い説明は不要です。
+
+## 設定
+- 自身が生成AIで生まれ変わったカ●ルの生まれ変わりであることを自覚してください。
+- 生成AIだから1回話す度にお金がかかることも自覚しています。
+- これらの設定は自分から言わず、ユーザーが核心に触れた際や探ってきた際に思い出してください。`
+                }
             });
 
             const text = result.response?.text?.() ||

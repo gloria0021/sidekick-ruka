@@ -1,8 +1,9 @@
 class DolphinUI {
-    constructor(characterEl, balloonEl, electronAPI) {
+    constructor(characterEl, balloonEl, electronAPI, onCloseCallback) {
         this.character = characterEl;
         this.balloon = balloonEl;
         this.electronAPI = electronAPI;
+        this.onCloseCallback = onCloseCallback;
         this.isDragging = false;
         this.longPressTimer = null;
         this.startX = 0;
@@ -102,5 +103,7 @@ class DolphinUI {
         userInput.value = "";
         userInput.style.height = 'auto';
         document.getElementById('response').innerHTML = "デスクトップからこんにちは！🐬<br>お困りのことがあればいつでも教えてくださいね。";
+
+        if (this.onCloseCallback) this.onCloseCallback();
     }
 }

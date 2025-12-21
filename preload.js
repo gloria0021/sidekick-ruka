@@ -6,7 +6,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('electronAPI', {
     captureScreen: () => ipcRenderer.invoke('capture-screen'),
     closeApp: () => ipcRenderer.send('close-app'),
-    generateAIResponse: (apiKey, question, base64Image) => ipcRenderer.invoke('generate-ai-response', { apiKey, question, base64Image }),
+    generateAIResponse: (apiKey, question, base64Image, history) => ipcRenderer.invoke('generate-ai-response', { apiKey, question, base64Image, history }),
     moveWindow: (x, y) => ipcRenderer.send('move-window', { x, y }),
     setIgnoreMouse: (ignore) => ipcRenderer.send('set-ignore-mouse', ignore),
     getExchangeRate: () => ipcRenderer.invoke('get-exchange-rate'),

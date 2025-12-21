@@ -23,9 +23,9 @@ ipcMain.handle('capture-screen', async () => {
     return await ScreenshotService.capture();
 });
 
-ipcMain.handle('generate-ai-response', async (event, { apiKey, question, base64Image }) => {
+ipcMain.handle('generate-ai-response', async (event, { apiKey, question, base64Image, history }) => {
     try {
-        return await AIService.generateResponse(apiKey, question, base64Image);
+        return await AIService.generateResponse(apiKey, question, base64Image, history);
     } catch (err) {
         return { error: err.message || err.toString() };
     }
