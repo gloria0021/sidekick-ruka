@@ -5,6 +5,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
     captureScreen: () => ipcRenderer.invoke('capture-screen'),
+    captureBackground: (rect) => ipcRenderer.invoke('capture-background', rect),
     closeApp: () => ipcRenderer.send('close-app'),
     generateAIResponse: (apiKey, question, base64Image, history) => ipcRenderer.invoke('generate-ai-response', { apiKey, question, base64Image, history }),
     moveWindow: (x, y) => ipcRenderer.send('move-window', { x, y }),

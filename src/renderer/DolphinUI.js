@@ -93,6 +93,46 @@ class DolphinUI {
         }
 
         if (this.isBalloonOpen) {
+            // 背景キャプチャ処理 (同期的に待機して、自分が写り込まないようにする)
+            try {
+                const pos = await this.electronAPI.getWindowPosition();
+                if (pos) {
+                    const rect = this.balloon.getBoundingClientRect();
+
+                    // 吹き出しの最大高さを計算 (response max-height: 300px + padding + input area等)
+                    // CSSで max-height: 300px, padding: 12px*2, input-area約80px = 約420px程度
+                    const maxBalloonHeight = 450;
+                    const balloonWidth = rect.width;
+
+                    // bottom から bottom: 184px の位置に吹き出しがある
+                    // 最大高さ分の領域をキャプチャ（下揃えで適用するため、上方向に拡張）
+                    const captureRect = {
+                        x: pos.x + rect.left,
+                        y: pos.y + rect.bottom - maxBalloonHeight,
+                        width: balloonWidth,
+                        height: maxBalloonHeight
+                    };
+                    // キャプチャ取得
+                    const bgDataUrl = await this.electronAPI.captureBackground(captureRect);
+
+                    if (bgDataUrl && this.isBalloonOpen) {
+                        // 背景画像を設定 (下揃えで適用)
+                         this.balloon.style.background = `
+                             linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5)),
+                             url(${bgDataUrl})
+                         `;
+                        this.balloon.style.backgroundPosition = 'bottom center';
+                        this.balloon.style.backgroundSize = '100% auto';
+                        this.balloon.style.backgroundRepeat = 'no-repeat';
+                        this.balloon.style.boxShadow = `0 0px 16px 0 rgba(197, 197, 197, 0.5)`;
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to set frosted background:", e);
+                // エラー時は何もしない（CSSのデフォルト背景が使われる）
+            }
+
+            // キャプチャ完了後に表示クラスを付与
             this.balloon.classList.add('active');
             document.getElementById('user-input').focus();
 
@@ -106,6 +146,9 @@ class DolphinUI {
                 }
             }
         } else {
+            // 閉じる時に背景をリセット
+            this.balloon.style.background = '';
+            this.balloon.style.boxShadow = ''; // シャドウもリセット
             this.closeBalloon();
         }
     }

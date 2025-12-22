@@ -38,6 +38,10 @@ if (!hasLock) {
         return await ScreenshotService.capture();
     });
 
+    ipcMain.handle('capture-background', async (event, rect) => {
+        return await ScreenshotService.captureArea(rect);
+    });
+
     ipcMain.handle('generate-ai-response', async (event, { apiKey, question, base64Image, history }) => {
         try {
             return await AIService.generateResponse(apiKey, question, base64Image, history);
