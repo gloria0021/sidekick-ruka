@@ -49,11 +49,11 @@
   },
   "devDependencies": {
     "electron": "^39.2.7",
-    "electron-builder": "^26.0.12",
-    "sharp": "^0.34.5"
+    "electron-builder": "^26.0.12"
   },
   "dependencies": {
     "@google/genai": "^1.34.0",
-    "@google/generative-ai": "^0.24.1"
+    "@google/generative-ai": "^0.24.1",
+    "sharp": "^0.34.5"
   }
 }

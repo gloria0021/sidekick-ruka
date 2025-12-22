@@ -45,6 +45,7 @@ class WindowManager {
     showWindow() {
         if (!this.mainWindow) {
             this.createWindow();
+            // 新規作成時はready-to-show後にfade-inが送られる
         } else {
             this.mainWindow.show();
             this.mainWindow.webContents.send('fade-in');

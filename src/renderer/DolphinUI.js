@@ -49,7 +49,7 @@ class DolphinUI {
             this.isPendingClick = false;
             this.character.classList.add('long-press', 'dragging');
             this.closeBalloon();
-        }, 1000);
+        }, 0);
     }
 
     onMouseMove(e) {
@@ -117,7 +117,7 @@ class DolphinUI {
 
                     if (bgDataUrl && this.isBalloonOpen) {
                         // 背景画像を設定 (下揃えで適用)
-                         this.balloon.style.background = `
+                        this.balloon.style.background = `
                              linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5)),
                              url(${bgDataUrl})
                          `;
@@ -146,9 +146,12 @@ class DolphinUI {
                 }
             }
         } else {
-            // 閉じる時に背景をリセット
+            // 閉じる時に背景関連のスタイルを全てリセット
             this.balloon.style.background = '';
-            this.balloon.style.boxShadow = ''; // シャドウもリセット
+            this.balloon.style.backgroundPosition = '';
+            this.balloon.style.backgroundSize = '';
+            this.balloon.style.backgroundRepeat = '';
+            this.balloon.style.boxShadow = '';
             this.closeBalloon();
         }
     }

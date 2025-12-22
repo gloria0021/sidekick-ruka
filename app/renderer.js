@@ -41,8 +41,13 @@ window.electronAPI.onOpenApiKeySetting(() => {
 });
 
 window.electronAPI.onFadeIn(() => {
-    // 処理は setTimeout 側で行うため、ここではクラス付与のみ
     container.classList.add('ready');
+    // トレイから表示された時も吹き出しを開く
+    setTimeout(() => {
+        if (dolphinUI && typeof dolphinUI.toggleBalloon === 'function') {
+            dolphinUI.toggleBalloon(true);
+        }
+    }, 100);
 });
 
 window.electronAPI.onFadeOut(() => {
