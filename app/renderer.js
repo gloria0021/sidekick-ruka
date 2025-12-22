@@ -262,14 +262,10 @@ setTimeout(async () => {
     }
     container.classList.add('ready');
 
-    // 起動時に確実に吹き出しを開き、メッセージを表示する
-    setTimeout(async () => {
+    // 起動時に確実に吹き出しを開く
+    setTimeout(() => {
         if (dolphinUI && typeof dolphinUI.toggleBalloon === 'function') {
             dolphinUI.toggleBalloon(true);
-            // 吹き出しが開いた後にタイプライター開始
-            await new Promise(resolve => setTimeout(resolve, 500));
-            responseArea.innerHTML = "";
-            await applyTypewriterEffect(responseArea, "デスクトップからこんにちは！<br>何について調べますか？");
         }
     }, 100);
 }, 100);

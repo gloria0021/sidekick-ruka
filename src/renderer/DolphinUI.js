@@ -49,7 +49,7 @@ class DolphinUI {
             this.isPendingClick = false;
             this.character.classList.add('long-press', 'dragging');
             this.closeBalloon();
-        }, 0);
+        }, 200);
     }
 
     onMouseMove(e) {
@@ -138,8 +138,7 @@ class DolphinUI {
 
             // 吹き出しを開く時に初期メッセージをタイプライター風に表示
             const responseArea = document.getElementById('response');
-            if (responseArea.innerHTML === "" || responseArea.innerHTML.includes("デスクトップからこんにちは")) {
-                responseArea.innerHTML = "";
+            if (responseArea.innerHTML === "") {
                 await new Promise(resolve => setTimeout(resolve, 300));
                 if (typeof applyTypewriterEffect === 'function') {
                     await applyTypewriterEffect(responseArea, "デスクトップからこんにちは！<br>何について調べますか？");
