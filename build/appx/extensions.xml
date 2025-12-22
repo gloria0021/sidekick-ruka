@@ -1,0 +1,7 @@
+<uap3:Extension Category="windows.appExtension" xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3">
+  <uap3:AppExtension Name="com.microsoft.windows.copilotkeyprovider"
+    Id="SidekickRukaCopilot"
+    DisplayName="Sidekick Ruka"
+    Description="AI Dolphin Assistant"
+    PublicFolder="public" />
+</uap3:Extension>

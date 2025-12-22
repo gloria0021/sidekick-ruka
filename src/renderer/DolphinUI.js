@@ -85,11 +85,26 @@ class DolphinUI {
         }
     }
 
-    toggleBalloon() {
-        this.isBalloonOpen = !this.isBalloonOpen;
+    async toggleBalloon(forceState) {
+        if (forceState !== undefined) {
+            this.isBalloonOpen = forceState;
+        } else {
+            this.isBalloonOpen = !this.isBalloonOpen;
+        }
+
         if (this.isBalloonOpen) {
             this.balloon.classList.add('active');
             document.getElementById('user-input').focus();
+
+            // 吹き出しを開く時に初期メッセージをタイプライター風に表示
+            const responseArea = document.getElementById('response');
+            if (responseArea.innerHTML === "" || responseArea.innerHTML.includes("デスクトップからこんにちは")) {
+                responseArea.innerHTML = "";
+                await new Promise(resolve => setTimeout(resolve, 300));
+                if (typeof applyTypewriterEffect === 'function') {
+                    await applyTypewriterEffect(responseArea, "デスクトップからこんにちは！<br>何について調べますか？");
+                }
+            }
         } else {
             this.closeBalloon();
         }
@@ -103,7 +118,7 @@ class DolphinUI {
         const userInput = document.getElementById('user-input');
         userInput.value = "";
         userInput.style.height = 'auto';
-        document.getElementById('response').innerHTML = "デスクトップからこんにちは！🐬<br>お困りのことがあればいつでも教えてくださいね。";
+        document.getElementById('response').innerHTML = ""; // 空にして次回のアニメーションに備える
 
         if (this.onCloseCallback) this.onCloseCallback();
     }

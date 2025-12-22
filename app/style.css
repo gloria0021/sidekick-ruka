@@ -28,47 +28,35 @@ body {
     height: 100vh;
     opacity: 0;
     transform: translateY(30px);
-    /* 待機時は下 */
-    transition:
-        opacity 0.5s ease-out,
-        transform 0s 0.5s;
-    /* クラス削除時は位置移動を遅延させる */
+    transition: opacity 0.5s ease-out, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 #container.ready {
     opacity: 1;
     transform: translateY(0);
-    transition:
-        opacity 0.6s ease-out,
-        transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-    /* 出現時は通常通り */
 }
 
-/* 吹き出し (Fluent Design / Mica風) */
 #balloon {
     position: absolute;
     bottom: 184px;
     right: 20px;
-
     background: var(--bg-mica);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-
     border: 1px solid var(--border-light);
     border-radius: var(--radius);
-
-    padding: 24px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
     width: 340px;
     max-width: 400px;
-
-    box-shadow:
-        0 12px 32px rgba(0, 0, 0, 0.12),
-        0 0 0 1px var(--border-dark);
-
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px var(--border-dark);
     opacity: 0;
     transform: scale(0.95) translateY(10px);
     transition: all 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
     pointer-events: none;
+    z-index: 100;
 }
 
 #balloon.active {
@@ -80,7 +68,7 @@ body {
 #response {
     font-size: 16px;
     line-height: 1.6;
-    font-weight: 500;
+    font-weight: 450;
     color: var(--text-main);
     max-height: 300px;
     overflow-y: auto;
@@ -112,6 +100,12 @@ body {
     flex-direction: column;
     gap: 6px;
     margin-top: 16px;
+}
+
+.input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
 
 .footer-area {
@@ -159,11 +153,11 @@ body {
 }
 
 #reset-btn:hover svg {
-    transform: rotate(-45deg);
+    /* transform: rotate(-45deg); */
 }
 
 #reset-btn svg {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); */
 }
 
 #screen-mode-container {
@@ -187,17 +181,6 @@ body {
 #cost-text {
     line-height: 1.4;
     text-align: right;
-}
-
-#user-input:focus {
-    background: rgba(255, 255, 255, 0.8);
-    border-color: var(--accent-color);
-}
-
-.input-row {
-    display: flex;
-    gap: 8px;
-    align-items: flex-end;
 }
 
 #user-input {
@@ -226,12 +209,13 @@ body {
     color: white;
     border: none;
     border-radius: 6px;
-    padding: 0 16px;
-    height: 38px;
+    padding: 0 8px;
+    height: 41px;
     font-weight: 600;
-    font-size: 13px;
+    font-size: 14px;
     font-family: inherit;
     cursor: pointer;
+    margin-left: -3px;
     transition: filter 0.2s, transform 0.1s;
 }
 
@@ -243,8 +227,7 @@ body {
     transform: scale(0.96);
 }
 
-
-/* モーダル設定 (Fluent風) */
+/* モーダル */
 .modal {
     display: none;
     position: absolute;
@@ -295,7 +278,6 @@ body {
     cursor: pointer;
     font-size: 13px;
     font-weight: 500;
-    transition: background 0.2s;
 }
 
 #api-key-save {
@@ -318,11 +300,9 @@ body {
 
 #character {
     width: 160px;
-    /* 少しサイズを調整 */
     height: auto;
     max-height: 160px;
     object-fit: contain;
-    /* 全体を表示 */
     filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.15));
     animation: float 4s ease-in-out infinite;
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -330,17 +310,11 @@ body {
 
 #character.long-press {
     transform: scale(1.1);
-    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.2)) brightness(1.1);
 }
 
 #character.dragging {
     opacity: 0.6;
     transform: scale(1.05);
-    cursor: grabbing;
-}
-
-#character:active {
-    cursor: grabbing;
 }
 
 @keyframes float {
