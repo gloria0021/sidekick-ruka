@@ -105,9 +105,8 @@ class DolphinUI {
                 if (pos) {
                     const rect = this.balloon.getBoundingClientRect();
 
-                    // 吹き出しの最大高さを計算 (response max-height: 300px + padding + input area等)
-                    // CSSで max-height: 300px, padding: 12px*2, input-area約80px = 約420px程度
-                    const maxBalloonHeight = 450;
+                    // 吹き出しの最大高さを計算 (response max-height: 480px + input area等)
+                    const maxBalloonHeight = 600;
                     const balloonWidth = rect.width;
 
                     // bottom から bottom: 184px の位置に吹き出しがある
