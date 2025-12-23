@@ -72,6 +72,8 @@ class DolphinUI {
             this.character.classList.remove('long-press', 'dragging');
             this.electronAPI.setIgnoreMouse(true);
             this.savePosition();
+            // 移動が終わったら吹き出しを出す
+            this.toggleBalloon(true);
         } else if (this.isPendingClick) {
             // ドラッグに移行せず、かつキャラクターの上でmousedownしていた場合のみ実行
             // イルカをクリックしたらアプリを隠す（非表示リクエスト）
