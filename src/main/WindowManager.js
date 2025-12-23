@@ -66,7 +66,7 @@ class WindowManager {
             const x = Math.round((width - WINDOW_WIDTH) / 2);
             const y = Math.round((height - WINDOW_HEIGHT) / 2);
             this.mainWindow.setPosition(x, y);
-            this.mainWindow.show();
+            this.showWindow(); // 位置リセットと同時に表示
             this.mainWindow.webContents.send('position-reset', { x, y });
         }
     }
@@ -77,8 +77,6 @@ class WindowManager {
 
         this.tray = new Tray(trayIcon);
         const contextMenu = Menu.buildFromTemplate([
-            { label: '呼ぶ (表示)', click: () => this.showWindow() },
-            { label: '消す (非表示)', click: () => this.hideWindow() },
             { label: '位置をリセット (中央へ)', click: () => this.resetWindowPosition() },
             { type: 'separator' },
             {

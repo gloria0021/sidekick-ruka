@@ -1,15 +1,17 @@
 class DolphinUI {
-    constructor(characterEl, balloonEl, electronAPI, onCloseCallback) {
+    constructor(characterEl, balloonEl, electronAPI, onCloseCallback, onHideRequest) {
         this.character = characterEl;
         this.balloon = balloonEl;
         this.electronAPI = electronAPI;
         this.onCloseCallback = onCloseCallback;
+        this.onHideRequest = onHideRequest;
         this.isDragging = false;
         this.longPressTimer = null;
         this.startX = 0;
         this.startY = 0;
         this.isBalloonOpen = false;
         this.isPendingClick = false;
+        this.isGreetingInProgress = false; // 挨拶メッセージ追加中かどうかのフラグ
 
         this.setupEvents();
     }
@@ -72,7 +74,8 @@ class DolphinUI {
             this.savePosition();
         } else if (this.isPendingClick) {
             // ドラッグに移行せず、かつキャラクターの上でmousedownしていた場合のみ実行
-            this.toggleBalloon();
+            // イルカをクリックしたらアプリを隠す（非表示リクエスト）
+            if (this.onHideRequest) this.onHideRequest();
         }
 
         this.isPendingClick = false;
@@ -140,14 +143,16 @@ class DolphinUI {
             const responseArea = document.getElementById('response');
             const initialGreeting = "デスクトップからこんにちは！<br>何について調べますか？";
 
-            // 既に同じメッセージが表示されている、または履歴がある場合は表示しない
-            // innerHTMLを直接比較する際はタグの解釈に注意が必要だが、空文字チェックと組み合わせる
-            if (responseArea.innerHTML.trim() === "") {
+            // 既に同じメッセージが表示されている、またはメッセージ追加中の場合はスキップ
+            if (responseArea.innerHTML.trim() === "" && !this.isGreetingInProgress) {
+                this.isGreetingInProgress = true;
                 await new Promise(resolve => setTimeout(resolve, 300));
+
                 // 待機中に中身が変わった可能性を再チェック
                 if (responseArea.innerHTML.trim() === "" && typeof applyTypewriterEffect === 'function') {
                     await applyTypewriterEffect(responseArea, initialGreeting);
                 }
+                this.isGreetingInProgress = false;
             }
         } else {
             // 閉じる時に背景関連のスタイルを全てリセット
@@ -169,6 +174,7 @@ class DolphinUI {
         userInput.value = "";
         userInput.style.height = 'auto';
         document.getElementById('response').innerHTML = ""; // 空にして次回のアニメーションに備える
+        this.isGreetingInProgress = false; // フラグもリセット
 
         if (this.onCloseCallback) this.onCloseCallback();
     }
