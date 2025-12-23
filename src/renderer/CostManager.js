@@ -42,7 +42,7 @@ class CostManager {
         const sessionJPY = sessionCostUSD * this.exchangeRate;
 
         return `
-            相談料: 約${sessionJPY.toFixed(2)}円 / 総額: 約${totalJPY.toFixed(2)}円<br>
+            今回の相談: 約${sessionJPY.toFixed(2)}円 / 総額: 約${totalJPY.toFixed(2)}円<br>
             (1$ = ${this.exchangeRate.toFixed(0)}円 ${this.rateTime})
         `;
     }

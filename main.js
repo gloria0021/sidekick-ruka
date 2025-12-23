@@ -79,4 +79,9 @@ if (!hasLock) {
             return { rate: 154, time: "レート取得失敗" };
         }
     });
+
+    ipcMain.on('open-external', (event, url) => {
+        const { shell } = require('electron');
+        shell.openExternal(url);
+    });
 }

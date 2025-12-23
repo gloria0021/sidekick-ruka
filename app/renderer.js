@@ -22,6 +22,7 @@ const apiKeyModal = document.getElementById('api-key-modal');
 const apiKeyInput = document.getElementById('api-key-input');
 const apiKeySave = document.getElementById('api-key-save');
 const apiKeyCancel = document.getElementById('api-key-cancel');
+const apiKeyLink = document.getElementById('api-key-link');
 
 // 初期表示
 const costText = document.getElementById('cost-text');
@@ -73,7 +74,12 @@ apiKeyCancel.addEventListener('click', () => {
     apiKeyModal.classList.remove('active');
 });
 
-[apiKeyModal, apiKeyInput, apiKeySave, apiKeyCancel].forEach(el => {
+apiKeyLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.electronAPI.openExternal('https://aistudio.google.com/api-keys');
+});
+
+[apiKeyModal, apiKeyInput, apiKeySave, apiKeyCancel, apiKeyLink].forEach(el => {
     el.addEventListener('mousedown', (e) => e.stopPropagation());
     el.addEventListener('mouseup', (e) => e.stopPropagation());
 });

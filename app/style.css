@@ -264,6 +264,22 @@ body {
     font-size: 13px;
 }
 
+.modal-link {
+    display: inline-block;
+    font-size: 11px;
+    margin-bottom: 12px;
+    color: var(--accent-color);
+    text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    cursor: pointer;
+}
+
+.modal-link:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+
 .modal-buttons {
     display: flex;
     justify-content: flex-end;

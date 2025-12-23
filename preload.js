@@ -16,5 +16,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onFadeIn: (callback) => ipcRenderer.on('fade-in', () => callback()),
     onFadeOut: (callback) => ipcRenderer.on('fade-out', () => callback()),
     onPositionReset: (callback) => ipcRenderer.on('position-reset', (event, pos) => callback(pos)),
-    onOpenApiKeySetting: (callback) => ipcRenderer.on('open-api-key-setting', () => callback())
+    onOpenApiKeySetting: (callback) => ipcRenderer.on('open-api-key-setting', () => callback()),
+    openExternal: (url) => ipcRenderer.send('open-external', url)
 });

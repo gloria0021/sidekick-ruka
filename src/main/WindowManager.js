@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen, Tray, Menu, nativeImage, ipcMain } = require('electron');
+const { app, BrowserWindow, screen, Tray, Menu, nativeImage, ipcMain, shell } = require('electron');
 const path = require('path');
 const { WINDOW_WIDTH, WINDOW_HEIGHT } = require('../shared/constants');
 
@@ -77,10 +77,12 @@ class WindowManager {
 
         this.tray = new Tray(trayIcon);
         const contextMenu = Menu.buildFromTemplate([
-            { label: '位置をリセット (中央へ)', click: () => this.resetWindowPosition() },
+            {
+                label: '🐬頭脳（Gemini-3-Flash）'
+            },
             { type: 'separator' },
             {
-                label: '給料(コスト表示)',
+                label: '相談料を表示',
                 type: 'checkbox',
                 checked: true,
                 click: (menuItem) => {
@@ -90,7 +92,7 @@ class WindowManager {
                 }
             },
             {
-                label: '魂を錬成 (APIキー設定)',
+                label: '魂を錬成 (Gemini APIキー設定)',
                 click: () => {
                     if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                         this.mainWindow.show();
@@ -99,6 +101,8 @@ class WindowManager {
                 }
             },
             { type: 'separator' },
+            { label: '位置をリセット', click: () => this.resetWindowPosition() },
+
             { label: 'さようなら (終了)', click: () => app.quit() }
         ]);
 
