@@ -16,8 +16,9 @@ class ScreenshotService {
             const size = display.size;
 
             // 物理解像度に合わせたサイズでキャプチャ
-            const thumbWidth = size.width * scaleFactor;
-            const thumbHeight = size.height * scaleFactor;
+            // 高DPI設定（150%, 175%等）では整数にならない可能性があるため丸める
+            const thumbWidth = Math.round(size.width * scaleFactor);
+            const thumbHeight = Math.round(size.height * scaleFactor);
 
             const sources = await desktopCapturer.getSources({
                 types: ['screen'],
