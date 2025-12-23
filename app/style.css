@@ -16,6 +16,26 @@
     --user-q-bg: rgba(255, 255, 255, 0.4);
     --modal-bg: rgba(255, 255, 255, 0.9);
     --glass-overlay: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
+
+    /* フォントサイズ変数 (デフォルト: Large) */
+    --font-size-base: 16px;
+    --font-size-sm: 13px;
+    --font-size-input: 14px;
+    --font-size-xs: 11px;
+}
+
+[data-font-size='medium'] {
+    --font-size-base: 14px;
+    --font-size-sm: 12px;
+    --font-size-input: 13px;
+    --font-size-xs: 10px;
+}
+
+[data-font-size='small'] {
+    --font-size-base: 12px;
+    --font-size-sm: 11px;
+    --font-size-input: 12px;
+    --font-size-xs: 9px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -121,7 +141,7 @@ body {
 }
 
 #response {
-    font-size: 16px;
+    font-size: var(--font-size-base);
     line-height: 1.6;
     font-weight: 450;
     color: var(--text-main);
@@ -141,7 +161,7 @@ body {
 }
 
 .user-question {
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     color: var(--text-secondary);
     background: var(--user-q-bg);
     padding: 8px 12px;
@@ -173,7 +193,7 @@ body {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    font-size: 11px;
+    font-size: var(--font-size-xs);
     color: var(--text-secondary);
     font-weight: 400;
     opacity: 0.8;
@@ -226,7 +246,7 @@ body {
 }
 
 #screen-mode-container span {
-    font-size: 11px;
+    font-size: var(--font-size-xs);
 }
 
 #cost-text {
@@ -241,7 +261,7 @@ body {
     border-bottom: 2px solid var(--accent-color);
     border-radius: 6px;
     padding: 10px 12px;
-    font-size: 14px;
+    font-size: var(--font-size-input);
     font-family: inherit;
     color: var(--text-main);
     resize: none;

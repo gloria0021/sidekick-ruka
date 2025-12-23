@@ -13,6 +13,16 @@ class WindowManager {
             this.updateTrayMenu();
             this.updateThemeInRenderer();
         });
+
+        this.currentFontSize = 'large'; // 初期値: 大
+    }
+
+    setFontSize(size) {
+        this.currentFontSize = size;
+        this.updateTrayMenu();
+        if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+            this.mainWindow.webContents.send('font-size-changed', size);
+        }
     }
 
     updateThemeInRenderer() {
@@ -146,22 +156,64 @@ class WindowManager {
             },
             { type: 'separator' },
             {
-                label: 'テーマ（システムと同期）',
-                type: 'checkbox',
-                checked: nativeTheme.themeSource === 'system',
-                click: (menuItem) => {
-                    nativeTheme.themeSource = menuItem.checked ? 'system' : (nativeTheme.shouldUseDarkColors ? 'dark' : 'light');
-                    this.updateTrayMenu();
-                }
-            },
-            {
-                label: 'ダークモード(手動)',
-                type: 'checkbox',
-                checked: nativeTheme.shouldUseDarkColors,
-                click: (menuItem) => {
-                    nativeTheme.themeSource = menuItem.checked ? 'dark' : 'light';
-                    this.updateTrayMenu();
-                }
+                label: '表示設定',
+                submenu: [
+                    {
+                        label: 'テーマ設定',
+                        submenu: [
+                            {
+                                label: '自動（システム設定）',
+                                type: 'radio',
+                                checked: nativeTheme.themeSource === 'system',
+                                click: () => {
+                                    nativeTheme.themeSource = 'system';
+                                    this.updateTrayMenu();
+                                }
+                            },
+                            {
+                                label: 'ライト',
+                                type: 'radio',
+                                checked: nativeTheme.themeSource === 'light',
+                                click: () => {
+                                    nativeTheme.themeSource = 'light';
+                                    this.updateTrayMenu();
+                                }
+                            },
+                            {
+                                label: 'ダーク',
+                                type: 'radio',
+                                checked: nativeTheme.themeSource === 'dark',
+                                click: () => {
+                                    nativeTheme.themeSource = 'dark';
+                                    this.updateTrayMenu();
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        label: 'フォントサイズ',
+                        submenu: [
+                            {
+                                label: '大 (標準)',
+                                type: 'radio',
+                                checked: this.currentFontSize === 'large',
+                                click: () => this.setFontSize('large')
+                            },
+                            {
+                                label: '中',
+                                type: 'radio',
+                                checked: this.currentFontSize === 'medium',
+                                click: () => this.setFontSize('medium')
+                            },
+                            {
+                                label: '小',
+                                type: 'radio',
+                                checked: this.currentFontSize === 'small',
+                                click: () => this.setFontSize('small')
+                            }
+                        ]
+                    }
+                ]
             },
             { type: 'separator' },
             {

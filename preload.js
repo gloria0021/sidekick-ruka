@@ -18,5 +18,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onPositionReset: (callback) => ipcRenderer.on('position-reset', (event, pos) => callback(pos)),
     onOpenApiKeySetting: (callback) => ipcRenderer.on('open-api-key-setting', () => callback()),
     onThemeChanged: (callback) => ipcRenderer.on('theme-changed', (event, data) => callback(data)),
+    onFontSizeChanged: (callback) => ipcRenderer.on('font-size-changed', (event, size) => callback(size)),
     openExternal: (url) => ipcRenderer.send('open-external', url)
 });

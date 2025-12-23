@@ -51,6 +51,10 @@ window.electronAPI.onThemeChanged((data) => {
     }
 });
 
+window.electronAPI.onFontSizeChanged((size) => {
+    document.documentElement.setAttribute('data-font-size', size);
+});
+
 window.electronAPI.onFadeIn(() => {
     // 表示開始時にまず状態をリセット（吹き出しが出たままになる現象を防止）
     dolphinUI.closeBalloon();
