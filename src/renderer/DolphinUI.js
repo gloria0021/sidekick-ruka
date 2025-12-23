@@ -105,8 +105,8 @@ class DolphinUI {
                 if (pos) {
                     const rect = this.balloon.getBoundingClientRect();
 
-                    // 吹き出しの最大高さを計算 (response max-height: 480px + input area等)
-                    const maxBalloonHeight = 600;
+                    // 吹き出しの最大高さを計算 (app/style.css の max-height: 680px に合わせる)
+                    const maxBalloonHeight = 680;
                     const balloonWidth = rect.width;
 
                     // bottom から bottom: 184px の位置に吹き出しがある
@@ -181,6 +181,8 @@ class DolphinUI {
         const userInput = document.getElementById('user-input');
         userInput.value = "";
         userInput.style.height = 'auto';
+        // 550pxまではスクロールバーを出さずに吹き出しを伸ばす
+        userInput.style.overflowY = 'hidden'; // Reset to hidden when closing
         document.getElementById('response').innerHTML = ""; // 空にして次回のアニメーションに備える
         this.isGreetingInProgress = false; // フラグもリセット
 

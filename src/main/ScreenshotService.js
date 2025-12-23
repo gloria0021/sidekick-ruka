@@ -28,6 +28,11 @@ class ScreenshotService {
             const source = sources[0];
             if (!source) return null;
 
+            // 実際のサムネイルサイズ（物理解像度）を取得
+            const thumbnailSize = source.thumbnail.getSize();
+            const realWidth = thumbnailSize.width;
+            const realHeight = thumbnailSize.height;
+
             const buffer = source.thumbnail.toPNG();
 
             // クロップ領域の計算（物理ピクセル）
@@ -36,13 +41,11 @@ class ScreenshotService {
             let width = Math.round(rect.width * scaleFactor);
             let height = Math.round(rect.height * scaleFactor);
 
-            // 範囲外補正
-            if (left < 0) { width += left; left = 0; }
-            if (top < 0) { height += top; top = 0; }
-            if (left + width > thumbWidth) width = thumbWidth - left;
-            if (top + height > thumbHeight) height = thumbHeight - top;
-
-            if (width <= 0 || height <= 0) return null;
+            // 範囲外補正（実際の画像サイズに合わせる）
+            left = Math.max(0, Math.min(left, realWidth - 1));
+            top = Math.max(0, Math.min(top, realHeight - 1));
+            width = Math.max(1, Math.min(width, realWidth - left));
+            height = Math.max(1, Math.min(height, realHeight - top));
 
             // Sharpで加工
             const sharp = require('sharp');

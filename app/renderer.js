@@ -259,7 +259,8 @@ userInput.addEventListener('input', () => {
     userInput.style.height = 'auto';
     const newHeight = userInput.scrollHeight;
     userInput.style.height = newHeight + 'px';
-    userInput.style.overflowY = newHeight >= 150 ? 'auto' : 'hidden';
+    // 450pxまではスクロールバーを出さずに吹き出しを伸ばす
+    userInput.style.overflowY = newHeight >= 450 ? 'auto' : 'hidden';
 });
 
 userInput.addEventListener('keydown', (e) => {
