@@ -42,6 +42,15 @@ window.electronAPI.onOpenApiKeySetting(() => {
     window.electronAPI.setIgnoreMouse(false);
 });
 
+window.electronAPI.onThemeChanged((data) => {
+    const theme = data.shouldUseDarkColors ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+    // すりガラスエフェクトのリアルタイム更新
+    if (dolphinUI && dolphinUI.isBalloonOpen && dolphinUI.currentBgDataUrl) {
+        dolphinUI.updateBalloonBackground(dolphinUI.currentBgDataUrl);
+    }
+});
+
 window.electronAPI.onFadeIn(() => {
     // 表示開始時にまず状態をリセット（吹き出しが出たままになる現象を防止）
     dolphinUI.closeBalloon();

@@ -10,6 +10,62 @@
     --text-main: #1a1a1a;
     --text-secondary: #000000;
     --radius: 16px;
+    --balloon-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.85) 100%);
+    --balloon-shadow: 0 0px 16px 0 rgba(197, 197, 197, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    --input-bg: rgba(255, 255, 255, 0.6);
+    --user-q-bg: rgba(255, 255, 255, 0.4);
+    --modal-bg: rgba(255, 255, 255, 0.9);
+    --glass-overlay: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --accent-color: #0095ff;
+        /* 明るめの青に調整 */
+        --bg-mica: #1a1a1a;
+        --border-light: rgba(0, 0, 0, 0.2);
+        --border-dark: rgba(30, 30, 30, 0.2);
+        --text-main: #efefef;
+        --text-secondary: #bababa;
+        --balloon-bg: linear-gradient(135deg, rgba(30, 30, 30, 0.9) 0%, rgba(20, 20, 20, 0.85) 100%);
+        --balloon-shadow: 0 0px 16px 0 rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        --input-bg: rgba(255, 255, 255, 0.1);
+        --user-q-bg: rgba(0, 0, 0, 0.3);
+        --modal-bg: rgba(25, 25, 25, 0.9);
+        --glass-overlay: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6));
+    }
+}
+
+/* 手動切替時もしくはデータ属性による上書き */
+[data-theme='dark'] {
+    --accent-color: #0095ff;
+    --bg-mica: #1a1a1a;
+    --border-light: rgba(0, 0, 0, 0.2);
+    --border-dark: rgba(255, 255, 255, 0.2);
+    --text-main: #efefef;
+    --text-secondary: #ffffff;
+    --balloon-bg: linear-gradient(135deg, rgba(30, 30, 30, 0.9) 0%, rgba(20, 20, 20, 0.85) 100%);
+    --balloon-shadow: 0 0px 16px 0 rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    --input-bg: rgba(255, 255, 255, 0.1);
+    --user-q-bg: rgba(0, 0, 0, 0.3);
+    --modal-bg: rgba(25, 25, 25, 0.9);
+    --glass-overlay: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6));
+}
+
+[data-theme='light'] {
+    --accent-color: #0078d4;
+    --bg-mica: #F7F7C5;
+    --border-light: rgba(128, 128, 128, 0.3);
+    --border-dark: rgba(0, 0, 0, 0.1);
+    --text-main: #1a1a1a;
+    --text-secondary: #000000;
+    --radius: 16px;
+    --balloon-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.85) 100%);
+    --balloon-shadow: 0 0px 16px 0 rgba(197, 197, 197, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    --input-bg: rgba(255, 255, 255, 0.6);
+    --user-q-bg: rgba(255, 255, 255, 0.4);
+    --modal-bg: rgba(255, 255, 255, 0.9);
+    --glass-overlay: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
 }
 
 body {
@@ -41,13 +97,9 @@ body {
     bottom: 184px;
     right: 20px;
     /* ミルキーガラス風デザイン */
-    background: rgba(255, 255, 255, 0.85);
-    /* わずかにグラデーションを入れて質感を出す */
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.85) 100%);
-    box-shadow:
-        0 8px 32px 0 rgba(31, 38, 135, 0.15),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: var(--balloon-bg);
+    box-shadow: var(--balloon-shadow);
+    border: 1px solid var(--border-light);
     border-radius: var(--radius);
     padding-top: 12px;
     padding-bottom: 12px;
@@ -84,14 +136,14 @@ body {
 }
 
 #response::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1);
+    background: var(--border-dark);
     border-radius: 10px;
 }
 
 .user-question {
     font-size: 13px;
     color: var(--text-secondary);
-    background: rgba(255, 255, 255, 0.4);
+    background: var(--user-q-bg);
     padding: 8px 12px;
     border-radius: 8px;
     margin-bottom: 12px;
@@ -150,7 +202,7 @@ body {
 }
 
 #reset-btn:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--border-dark);
     opacity: 1;
     color: var(--accent-color);
 }
@@ -184,8 +236,8 @@ body {
 
 #user-input {
     flex: 1;
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: var(--input-bg);
+    border: 1px solid var(--border-dark);
     border-bottom: 2px solid var(--accent-color);
     border-radius: 6px;
     padding: 10px 12px;
@@ -199,7 +251,7 @@ body {
 }
 
 #user-input:focus {
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--input-bg);
     border-color: var(--accent-color);
 }
 
@@ -234,7 +286,7 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 280px;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--modal-bg);
     backdrop-filter: blur(20px);
     border: 1px solid var(--border-light);
     border-radius: var(--radius);
@@ -257,11 +309,12 @@ body {
 .modal-content input {
     width: 100%;
     padding: 10px;
-    background: white;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: var(--input-bg);
+    border: 1px solid var(--border-dark);
     border-radius: 4px;
     margin-bottom: 20px;
     font-size: 13px;
+    color: var(--text-main);
 }
 
 .modal-link {

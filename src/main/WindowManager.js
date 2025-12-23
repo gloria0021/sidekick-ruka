@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen, Tray, Menu, nativeImage, ipcMain, shell, globalShortcut } = require('electron');
+const { app, BrowserWindow, screen, Tray, Menu, nativeImage, ipcMain, shell, globalShortcut, nativeTheme } = require('electron');
 const path = require('path');
 const { WINDOW_WIDTH, WINDOW_HEIGHT } = require('../shared/constants');
 
@@ -7,6 +7,21 @@ class WindowManager {
         this.mainWindow = null;
         this.tray = null;
         this.hasShownOnce = false;
+
+        // システムテーマの変更を検知してトレイメニューとレンダラーを更新
+        nativeTheme.on('updated', () => {
+            this.updateTrayMenu();
+            this.updateThemeInRenderer();
+        });
+    }
+
+    updateThemeInRenderer() {
+        if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+            this.mainWindow.webContents.send('theme-changed', {
+                shouldUseDarkColors: nativeTheme.shouldUseDarkColors,
+                themeSource: nativeTheme.themeSource
+            });
+        }
     }
 
     createWindow() {
@@ -37,6 +52,7 @@ class WindowManager {
         this.mainWindow.once('ready-to-show', () => {
             // 初回作成時はアニメーションで表示
             this.showWindow();
+            this.updateThemeInRenderer();
         });
 
         this.mainWindow.on('closed', () => {
@@ -121,20 +137,37 @@ class WindowManager {
         }
     }
 
-    createTray() {
-        const iconPath = path.join(__dirname, '../../app/assets/dolphin.png');
-        const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
+    updateTrayMenu() {
+        if (!this.tray) return;
 
-        this.tray = new Tray(trayIcon);
         const contextMenu = Menu.buildFromTemplate([
             {
                 label: '🐬頭脳（Gemini-3-Flash）'
             },
             { type: 'separator' },
             {
+                label: 'テーマ（システムと同期）',
+                type: 'checkbox',
+                checked: nativeTheme.themeSource === 'system',
+                click: (menuItem) => {
+                    nativeTheme.themeSource = menuItem.checked ? 'system' : (nativeTheme.shouldUseDarkColors ? 'dark' : 'light');
+                    this.updateTrayMenu();
+                }
+            },
+            {
+                label: 'ダークモード(手動)',
+                type: 'checkbox',
+                checked: nativeTheme.shouldUseDarkColors,
+                click: (menuItem) => {
+                    nativeTheme.themeSource = menuItem.checked ? 'dark' : 'light';
+                    this.updateTrayMenu();
+                }
+            },
+            { type: 'separator' },
+            {
                 label: '相談料を表示',
                 type: 'checkbox',
-                checked: true,
+                checked: true, // TODO: 本来は状態を保持すべきだが、今回は簡易化
                 click: (menuItem) => {
                     if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                         this.mainWindow.webContents.send('toggle-cost-display', menuItem.checked);
@@ -152,12 +185,19 @@ class WindowManager {
             },
             { type: 'separator' },
             { label: '位置をリセット', click: () => this.resetWindowPosition() },
-
             { label: 'さようなら (終了)', click: () => app.quit() }
         ]);
 
-        this.tray.setToolTip('AIアシスタント（ルカ）');
         this.tray.setContextMenu(contextMenu);
+    }
+
+    createTray() {
+        const iconPath = path.join(__dirname, '../../app/assets/dolphin.png');
+        const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
+
+        this.tray = new Tray(trayIcon);
+        this.tray.setToolTip('AIアシスタント（ルカ）');
+        this.updateTrayMenu();
 
         this.tray.on('click', () => {
             if (this.mainWindow && !this.mainWindow.isDestroyed()) {

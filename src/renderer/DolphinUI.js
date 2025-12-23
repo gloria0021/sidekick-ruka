@@ -12,6 +12,7 @@ class DolphinUI {
         this.isBalloonOpen = false;
         this.isPendingClick = false;
         this.isGreetingInProgress = false; // 挨拶メッセージ追加中かどうかのフラグ
+        this.currentBgDataUrl = null; // 現在の背景キャプチャ画像を保持
 
         this.setupEvents();
     }
@@ -121,15 +122,8 @@ class DolphinUI {
                     const bgDataUrl = await this.electronAPI.captureBackground(captureRect);
 
                     if (bgDataUrl && this.isBalloonOpen) {
-                        // 背景画像を設定 (下揃えで適用)
-                        this.balloon.style.background = `
-                             linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5)),
-                             url(${bgDataUrl})
-                         `;
-                        this.balloon.style.backgroundPosition = 'bottom center';
-                        this.balloon.style.backgroundSize = '100% auto';
-                        this.balloon.style.backgroundRepeat = 'no-repeat';
-                        this.balloon.style.boxShadow = `0 0px 16px 0 rgba(197, 197, 197, 0.5)`;
+                        this.currentBgDataUrl = bgDataUrl;
+                        this.updateBalloonBackground(bgDataUrl);
                     }
                 }
             } catch (e) {
@@ -158,6 +152,7 @@ class DolphinUI {
             }
         } else {
             // 閉じる時に背景関連のスタイルを全てリセット
+            this.currentBgDataUrl = null;
             this.balloon.style.background = '';
             this.balloon.style.backgroundPosition = '';
             this.balloon.style.backgroundSize = '';
@@ -165,6 +160,18 @@ class DolphinUI {
             this.balloon.style.boxShadow = '';
             this.closeBalloon();
         }
+    }
+
+    updateBalloonBackground(bgDataUrl) {
+        // 背景画像を設定 (下揃えで適用)
+        // グラデーションはCSS変数 (--glass-overlay) を使うことでテーマ変更時に自動追従させる
+        this.balloon.style.background = `
+             var(--glass-overlay),
+             url(${bgDataUrl})
+         `;
+        this.balloon.style.backgroundPosition = 'bottom center';
+        this.balloon.style.backgroundSize = '100% auto';
+        this.balloon.style.backgroundRepeat = 'no-repeat';
     }
 
     closeBalloon() {
