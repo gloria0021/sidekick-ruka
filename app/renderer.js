@@ -43,13 +43,20 @@ window.electronAPI.onOpenApiKeySetting(() => {
 });
 
 window.electronAPI.onFadeIn(() => {
-    container.classList.add('ready');
-    // トレイやショートカットからの表示命令。確実に吹き出しを開く。
-    setTimeout(() => {
-        if (dolphinUI && typeof dolphinUI.toggleBalloon === 'function') {
-            dolphinUI.toggleBalloon(true);
-        }
-    }, 100);
+    // 表示開始時にまず状態をリセット（吹き出しが出たままになる現象を防止）
+    dolphinUI.closeBalloon();
+
+    // 少し待ってからフェードイン開始
+    requestAnimationFrame(() => {
+        container.classList.add('ready');
+
+        // フェードインに合わせて吹き出しを開く
+        setTimeout(() => {
+            if (dolphinUI && typeof dolphinUI.toggleBalloon === 'function') {
+                dolphinUI.toggleBalloon(true);
+            }
+        }, 100);
+    });
 });
 
 window.electronAPI.onFadeOut(() => {

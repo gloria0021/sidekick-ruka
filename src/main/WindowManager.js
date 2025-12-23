@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen, Tray, Menu, nativeImage, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, screen, Tray, Menu, nativeImage, ipcMain, shell, globalShortcut } = require('electron');
 const path = require('path');
 const { WINDOW_WIDTH, WINDOW_HEIGHT } = require('../shared/constants');
 
@@ -6,6 +6,7 @@ class WindowManager {
     constructor() {
         this.mainWindow = null;
         this.tray = null;
+        this.hasShownOnce = false;
     }
 
     createWindow() {
@@ -34,20 +35,69 @@ class WindowManager {
         this.mainWindow.setAlwaysOnTop(true, 'screen-saver');
 
         this.mainWindow.once('ready-to-show', () => {
+            // 初回作成時はアニメーションで表示
             this.showWindow();
         });
 
         this.mainWindow.on('closed', () => {
             this.mainWindow = null;
         });
+
+        this.registerShortcuts();
+    }
+
+    registerShortcuts() {
+        // Copilotキー (Windows + Shift + F23)
+        // 注意: 環境によってはキーコードが異なる場合があります
+        const copilotKey = 'Super+Shift+F23';
+
+        // 既存のショートカットがあれば解除
+        globalShortcut.unregister(copilotKey);
+
+        const ret = globalShortcut.register(copilotKey, () => {
+            this.handleCopilotKey();
+        });
+
+        if (!ret) {
+            console.log('Copilot key registration failed. Trying fallback (F23 only)...');
+            // フォールバック: F23のみ (一部のマクロ設定用)
+            globalShortcut.register('F23', () => {
+                this.handleCopilotKey();
+            });
+        }
+    }
+
+    handleCopilotKey() {
+        if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+            if (this.mainWindow.isVisible()) {
+                // 表示中は隠す（ESCキーと同じ挙動＝アニメーションあり）
+                this.hideWindow();
+            } else {
+                // 非表示なら表示する（アニメーションあり）
+                this.showWindow();
+            }
+        } else {
+            // ウィンドウがない場合は作成して表示
+            this.showWindow();
+        }
     }
 
     showWindow() {
         if (!this.mainWindow) {
             this.createWindow();
-            // 新規作成時はready-to-show後にfade-inが送られる
+            // createWindow内でready-to-show後にshowWindow()が呼ばれる
         } else {
-            this.mainWindow.show();
+            // 常に最前面へ
+            this.mainWindow.setAlwaysOnTop(true, 'screen-saver');
+
+            // 隠れている場合は表示
+            if (!this.mainWindow.isVisible()) {
+                this.mainWindow.show();
+            }
+
+            // フォーカスも当てる
+            this.mainWindow.focus();
+
             this.mainWindow.webContents.send('fade-in');
         }
     }
@@ -66,7 +116,7 @@ class WindowManager {
             const x = Math.round((width - WINDOW_WIDTH) / 2);
             const y = Math.round((height - WINDOW_HEIGHT) / 2);
             this.mainWindow.setPosition(x, y);
-            this.showWindow(); // 位置リセットと同時に表示
+            this.showWindow(); // 位置リセット時はアニメーションありで表示
             this.mainWindow.webContents.send('position-reset', { x, y });
         }
     }
@@ -112,9 +162,9 @@ class WindowManager {
         this.tray.on('click', () => {
             if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                 if (this.mainWindow.isVisible()) {
-                    this.hideWindow();
+                    this.hideWindow(); // トレイクリックはアニメーションありで閉じる（慣例）
                 } else {
-                    this.showWindow();
+                    this.showWindow(); // トレイクリックはアニメーションあり
                 }
             } else {
                 this.showWindow();
