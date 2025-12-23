@@ -97,10 +97,9 @@ async function fadeOutHelper() {
     if (pos) {
         localStorage.setItem('window_pos', JSON.stringify(pos));
     }
-
+    dolphinUI.closeBalloon();
     container.classList.remove('ready');
     await new Promise(resolve => setTimeout(resolve, 500));
-    dolphinUI.closeBalloon();
     window.electronAPI.closeApp();
 }
 

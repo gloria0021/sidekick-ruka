@@ -156,7 +156,7 @@ class WindowManager {
             { label: 'さようなら (終了)', click: () => app.quit() }
         ]);
 
-        this.tray.setToolTip('AIイルカ');
+        this.tray.setToolTip('AIアシスタント（ルカ）');
         this.tray.setContextMenu(contextMenu);
 
         this.tray.on('click', () => {
