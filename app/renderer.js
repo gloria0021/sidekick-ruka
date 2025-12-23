@@ -4,6 +4,7 @@ const getApiKey = () => localStorage.getItem('gemini_api_key') || "";
 // クラスのインスタンス化 (index.htmlで先に読み込まれている前提)
 const costManager = new CostManager();
 let conversationHistory = [];
+let initialOpenDone = false; // 起動時の初期表示が完了したかどうかのフラグ
 
 const dolphinUI = new DolphinUI(
     document.getElementById('character'),
@@ -42,12 +43,15 @@ window.electronAPI.onOpenApiKeySetting(() => {
 
 window.electronAPI.onFadeIn(() => {
     container.classList.add('ready');
-    // トレイから表示された時も吹き出しを開く
-    setTimeout(() => {
-        if (dolphinUI && typeof dolphinUI.toggleBalloon === 'function') {
-            dolphinUI.toggleBalloon(true);
-        }
-    }, 100);
+    // トレイから表示された時も、まだ一回も開いていなければ吹き出しを開く
+    if (!initialOpenDone) {
+        setTimeout(() => {
+            if (dolphinUI && typeof dolphinUI.toggleBalloon === 'function') {
+                dolphinUI.toggleBalloon(true);
+                initialOpenDone = true;
+            }
+        }, 300); // 念のため少し長めに待機
+    }
 });
 
 window.electronAPI.onFadeOut(() => {
@@ -262,12 +266,15 @@ setTimeout(async () => {
     }
     container.classList.add('ready');
 
-    // 起動時に確実に吹き出しを開く
-    setTimeout(() => {
-        if (dolphinUI && typeof dolphinUI.toggleBalloon === 'function') {
-            dolphinUI.toggleBalloon(true);
-        }
-    }, 100);
+    // 起動時に確実に吹き出しを開く (まだ開いていなければ)
+    if (!initialOpenDone) {
+        setTimeout(() => {
+            if (dolphinUI && typeof dolphinUI.toggleBalloon === 'function') {
+                dolphinUI.toggleBalloon(true);
+                initialOpenDone = true;
+            }
+        }, 100);
+    }
 }, 100);
 
 window.electronAPI.setIgnoreMouse(true);

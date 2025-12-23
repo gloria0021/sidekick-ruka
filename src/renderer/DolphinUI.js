@@ -138,10 +138,15 @@ class DolphinUI {
 
             // 吹き出しを開く時に初期メッセージをタイプライター風に表示
             const responseArea = document.getElementById('response');
-            if (responseArea.innerHTML === "") {
+            const initialGreeting = "デスクトップからこんにちは！<br>何について調べますか？";
+
+            // 既に同じメッセージが表示されている、または履歴がある場合は表示しない
+            // innerHTMLを直接比較する際はタグの解釈に注意が必要だが、空文字チェックと組み合わせる
+            if (responseArea.innerHTML.trim() === "") {
                 await new Promise(resolve => setTimeout(resolve, 300));
-                if (typeof applyTypewriterEffect === 'function') {
-                    await applyTypewriterEffect(responseArea, "デスクトップからこんにちは！<br>何について調べますか？");
+                // 待機中に中身が変わった可能性を再チェック
+                if (responseArea.innerHTML.trim() === "" && typeof applyTypewriterEffect === 'function') {
+                    await applyTypewriterEffect(responseArea, initialGreeting);
                 }
             }
         } else {
