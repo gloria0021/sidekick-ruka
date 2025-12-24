@@ -96,7 +96,7 @@
     --text-main: #ffffff;
     --text-secondary: rgba(255, 255, 255, 1);
     --balloon-bg: linear-gradient(145deg, rgb(13, 20, 137) 0%, rgb(43, 50, 189) 100%);
-    --balloon-shadow: 0 0px 16px 0 rgb(19, 15, 127), inset 0 0 0 1px rgb(11, 7, 78);
+    --balloon-shadow: 0 0px 16px 0 rgb(19, 15, 127), inset 0 0 0 1px #2930BA;
     --input-bg: rgba(0, 0, 0, 0.25);
     --user-q-bg: rgba(255, 255, 255, 0.12);
     --modal-bg: rgba(18, 29, 181, 0.95);

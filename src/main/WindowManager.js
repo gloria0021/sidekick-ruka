@@ -240,7 +240,7 @@ class WindowManager {
                                 }
                             },
                             {
-                                label: 'イルカブルー（軽量）',
+                                label: 'イルカブルー',
                                 type: 'radio',
                                 checked: this.selectedTheme === 'dolphin-blue',
                                 click: () => {
