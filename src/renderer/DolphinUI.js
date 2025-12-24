@@ -99,45 +99,12 @@ class DolphinUI {
         }
 
         if (this.isBalloonOpen) {
-            const theme = document.documentElement.getAttribute('data-theme');
-
-            // イルカブルー（軽量テーマ）の場合は背景キャプチャをスキップ
-            if (theme === 'dolphin-blue') {
-                this.updateBalloonBackground(null);
-            } else {
-                // 背景キャプチャ処理 (同期的に待機して、自分が写り込まないようにする)
-                try {
-                    const pos = await this.electronAPI.getWindowPosition();
-                    if (pos) {
-                        const rect = this.balloon.getBoundingClientRect();
-
-                        // 吹き出しの最大高さを計算 (app/style.css の max-height: 680px に合わせる)
-                        const maxBalloonHeight = 680;
-                        const balloonWidth = rect.width;
-
-                        // bottom から bottom: 184px の位置に吹き出しがある
-                        // 最大高さ分の領域をキャプチャ（下揃えで適用するため、上方向に拡張）
-                        const captureRect = {
-                            x: pos.x + rect.left,
-                            y: pos.y + rect.bottom - maxBalloonHeight,
-                            width: balloonWidth,
-                            height: maxBalloonHeight
-                        };
-                        // キャプチャ取得
-                        const bgDataUrl = await this.electronAPI.captureBackground(captureRect);
-
-                        if (bgDataUrl && this.isBalloonOpen) {
-                            this.currentBgDataUrl = bgDataUrl;
-                            this.updateBalloonBackground(bgDataUrl);
-                        }
-                    }
-                } catch (e) {
-                    console.error("Failed to set frosted background:", e);
-                    // エラー時は何もしない（CSSのデフォルト背景が使われる）
-                }
+            // 背景が必要な場合は仕込む（もし事前に setupBackground されていなければここで実行）
+            if (!this.currentBgDataUrl) {
+                await this.setupBackground();
             }
 
-            // キャプチャ完了後に表示クラスを付与
+            // 表示クラスを付与 (アニメーション開始)
             this.balloon.classList.add('active');
             document.getElementById('user-input').focus();
 
@@ -165,6 +132,39 @@ class DolphinUI {
             this.balloon.style.backgroundRepeat = '';
             this.balloon.style.boxShadow = '';
             this.closeBalloon();
+        }
+    }
+
+    async setupBackground() {
+        const theme = document.documentElement.getAttribute('data-theme');
+        if (theme === 'dolphin-blue') {
+            this.updateBalloonBackground(null);
+            return;
+        }
+
+        try {
+            const pos = await this.electronAPI.getWindowPosition();
+            if (pos) {
+                const balloonWidth = 340;
+                const rightOffset = 20;
+                const maxBalloonHeight = 680;
+                const balloonBottomY = 1005;
+
+                const captureRect = {
+                    x: pos.x + (400 - balloonWidth - rightOffset),
+                    y: pos.y + balloonBottomY - maxBalloonHeight,
+                    width: balloonWidth,
+                    height: maxBalloonHeight
+                };
+
+                const bgDataUrl = await this.electronAPI.captureBackground(captureRect);
+                if (bgDataUrl) {
+                    this.currentBgDataUrl = bgDataUrl;
+                    this.updateBalloonBackground(bgDataUrl);
+                }
+            }
+        } catch (e) {
+            console.error("Failed to setup background:", e);
         }
     }
 

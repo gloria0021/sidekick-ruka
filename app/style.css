@@ -92,7 +92,6 @@
     --accent-color: #2930b0;
     --bg-mica: #141cbf;
     --border-light: rgba(255, 255, 255, 0.3);
-    --border-dark: rgba(0, 0, 0, 0.4);
     --text-main: #ffffff;
     --text-secondary: rgba(255, 255, 255, 1);
     --balloon-bg: linear-gradient(145deg, rgb(13, 20, 137) 0%, rgb(43, 50, 189) 100%);
@@ -201,12 +200,12 @@ body {
     flex-direction: column;
     gap: 6px;
     padding: 12px 16px;
-    background: rgba(0, 0, 0, 0.03);
-    border-top: 1px solid var(--border-light);
+    background: transparent;
+    border-top: none;
 }
 
 [data-theme='dark'] .input-area {
-    background: rgba(255, 255, 255, 0.03);
+    background: transparent;
 }
 
 .input-row {

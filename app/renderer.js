@@ -55,9 +55,14 @@ window.electronAPI.onFontSizeChanged((size) => {
     document.documentElement.setAttribute('data-font-size', size);
 });
 
-window.electronAPI.onFadeIn(() => {
+window.electronAPI.onFadeIn(async () => {
     // 表示開始時にまず状態をリセット（吹き出しが出たままになる現象を防止）
     dolphinUI.closeBalloon();
+
+    // アニメーション開始前に背景を静かにキャプチャしておく
+    // ウィンドウ自体は show() されているが、containerがまだ opacity: 0 なので
+    // ユーザーには見えず、かつデスクトップ背景だけがきれいにとれる
+    await dolphinUI.setupBackground();
 
     // 少し待ってからフェードイン開始
     requestAnimationFrame(() => {
