@@ -13,7 +13,7 @@
     --balloon-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.85) 100%);
     --balloon-shadow: 0 0px 16px 0 rgba(197, 197, 197, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
     --input-bg: rgba(255, 255, 255, 0.6);
-    --user-q-bg: rgba(255, 255, 255, 0.4);
+    --user-q-bg: rgba(255, 255, 255, 0.7);
     --modal-bg: rgba(255, 255, 255, 0.9);
     --glass-overlay: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
 
@@ -67,7 +67,7 @@
     --balloon-bg: linear-gradient(135deg, rgba(30, 30, 30, 0.9) 0%, rgba(20, 20, 20, 0.85) 100%);
     --balloon-shadow: 0 0px 16px 0 rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
     --input-bg: rgba(255, 255, 255, 0.1);
-    --user-q-bg: rgba(100, 100, 100, 0.3);
+    --user-q-bg: rgba(70, 70, 70, 0.7);
     --modal-bg: rgba(25, 25, 25, 0.9);
     --glass-overlay: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6));
 }
@@ -83,7 +83,7 @@
     --balloon-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.85) 100%);
     --balloon-shadow: 0 0px 16px 0 rgba(197, 197, 197, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
     --input-bg: rgba(255, 255, 255, 0.6);
-    --user-q-bg: rgba(255, 255, 255, 0.4);
+    --user-q-bg: rgba(255, 255, 255, 0.7);
     --modal-bg: rgba(255, 255, 255, 0.9);
     --glass-overlay: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
 }
