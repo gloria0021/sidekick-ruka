@@ -43,7 +43,7 @@ window.electronAPI.onOpenApiKeySetting(() => {
 });
 
 window.electronAPI.onThemeChanged((data) => {
-    const theme = data.shouldUseDarkColors ? 'dark' : 'light';
+    const theme = data.theme || (data.shouldUseDarkColors ? 'dark' : 'light');
     document.documentElement.setAttribute('data-theme', theme);
     // すりガラスエフェクトのリアルタイム更新
     if (dolphinUI && dolphinUI.isBalloonOpen && dolphinUI.currentBgDataUrl) {

@@ -1,5 +1,6 @@
 const { app, BrowserWindow, screen, Tray, Menu, nativeImage, ipcMain, shell, globalShortcut, nativeTheme } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const { WINDOW_WIDTH, WINDOW_HEIGHT } = require('../shared/constants');
 
 class WindowManager {
@@ -7,18 +8,55 @@ class WindowManager {
         this.mainWindow = null;
         this.tray = null;
         this.hasShownOnce = false;
+        this.currentFontSize = 'large'; // デフォルト
+        this.selectedTheme = 'system'; // デフォルト
+        this.settingsPath = path.join(app.getPath('userData'), 'settings.json');
+
+        this.loadSettings();
 
         // システムテーマの変更を検知してトレイメニューとレンダラーを更新
         nativeTheme.on('updated', () => {
             this.updateTrayMenu();
             this.updateThemeInRenderer();
         });
+    }
 
-        this.currentFontSize = 'large'; // 初期値: 大
+    loadSettings() {
+        try {
+            if (fs.existsSync(this.settingsPath)) {
+                const settings = JSON.parse(fs.readFileSync(this.settingsPath, 'utf8'));
+                if (settings.theme) this.selectedTheme = settings.theme;
+                if (settings.fontSize) this.currentFontSize = settings.fontSize;
+
+                // 明示的なテーマ設定がある場合はシステム設定を反映
+                if (this.selectedTheme === 'dark' || this.selectedTheme === 'dolphin-blue') {
+                    nativeTheme.themeSource = 'dark';
+                } else if (this.selectedTheme === 'light') {
+                    nativeTheme.themeSource = 'light';
+                } else {
+                    nativeTheme.themeSource = 'system';
+                }
+            }
+        } catch (err) {
+            console.error('Failed to load settings:', err);
+        }
+    }
+
+    saveSettings() {
+        try {
+            const settings = {
+                theme: this.selectedTheme,
+                fontSize: this.currentFontSize
+            };
+            fs.writeFileSync(this.settingsPath, JSON.stringify(settings, null, 2));
+        } catch (err) {
+            console.error('Failed to save settings:', err);
+        }
     }
 
     setFontSize(size) {
         this.currentFontSize = size;
+        this.saveSettings();
         this.updateTrayMenu();
         if (this.mainWindow && !this.mainWindow.isDestroyed()) {
             this.mainWindow.webContents.send('font-size-changed', size);
@@ -27,9 +65,13 @@ class WindowManager {
 
     updateThemeInRenderer() {
         if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+            let theme = this.selectedTheme;
+            if (theme === 'system') {
+                theme = nativeTheme.shouldUseDarkColors ? 'dark' : 'light';
+            }
             this.mainWindow.webContents.send('theme-changed', {
-                shouldUseDarkColors: nativeTheme.shouldUseDarkColors,
-                themeSource: nativeTheme.themeSource
+                theme: theme,
+                shouldUseDarkColors: nativeTheme.shouldUseDarkColors
             });
         }
     }
@@ -164,28 +206,50 @@ class WindowManager {
                             {
                                 label: '自動（システム設定）',
                                 type: 'radio',
-                                checked: nativeTheme.themeSource === 'system',
+                                checked: this.selectedTheme === 'system',
                                 click: () => {
+                                    this.selectedTheme = 'system';
                                     nativeTheme.themeSource = 'system';
+                                    this.saveSettings();
                                     this.updateTrayMenu();
+                                    this.updateThemeInRenderer();
                                 }
                             },
                             {
                                 label: 'ライト',
                                 type: 'radio',
-                                checked: nativeTheme.themeSource === 'light',
+                                checked: this.selectedTheme === 'light',
                                 click: () => {
+                                    this.selectedTheme = 'light';
                                     nativeTheme.themeSource = 'light';
+                                    this.saveSettings();
                                     this.updateTrayMenu();
+                                    this.updateThemeInRenderer();
                                 }
                             },
                             {
                                 label: 'ダーク',
                                 type: 'radio',
-                                checked: nativeTheme.themeSource === 'dark',
+                                checked: this.selectedTheme === 'dark',
                                 click: () => {
+                                    this.selectedTheme = 'dark';
                                     nativeTheme.themeSource = 'dark';
+                                    this.saveSettings();
                                     this.updateTrayMenu();
+                                    this.updateThemeInRenderer();
+                                }
+                            },
+                            {
+                                label: 'イルカブルー（軽量）',
+                                type: 'radio',
+                                checked: this.selectedTheme === 'dolphin-blue',
+                                click: () => {
+                                    this.selectedTheme = 'dolphin-blue';
+                                    // イルカブルーはベースを系統としてはダーク寄りにする（文字色白など）
+                                    nativeTheme.themeSource = 'dark';
+                                    this.saveSettings();
+                                    this.updateTrayMenu();
+                                    this.updateThemeInRenderer();
                                 }
                             }
                         ]

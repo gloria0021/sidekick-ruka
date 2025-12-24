@@ -88,6 +88,21 @@
     --glass-overlay: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
 }
 
+[data-theme='dolphin-blue'] {
+    --accent-color: #2930b0;
+    --bg-mica: #141cbf;
+    --border-light: rgba(255, 255, 255, 0.3);
+    --border-dark: rgba(0, 0, 0, 0.4);
+    --text-main: #bccdf4;
+    --text-secondary: rgba(255, 255, 255, 0.82);
+    --balloon-bg: linear-gradient(145deg, rgb(13, 20, 137) 0%, rgb(43, 50, 189) 100%);
+    --balloon-shadow: 0 0px 16px 0 rgb(19, 15, 127), inset 0 0 0 1px rgb(11, 7, 78);
+    --input-bg: rgba(0, 0, 0, 0.25);
+    --user-q-bg: rgba(255, 255, 255, 0.12);
+    --modal-bg: rgba(18, 29, 181, 0.95);
+    --glass-overlay: linear-gradient(135deg, rgba(25, 37, 233, 0.85) 0%, rgba(7, 62, 207, 0.85) 100%);
+}
+
 body {
     margin: 0;
     padding: 0;

@@ -99,35 +99,42 @@ class DolphinUI {
         }
 
         if (this.isBalloonOpen) {
-            // 背景キャプチャ処理 (同期的に待機して、自分が写り込まないようにする)
-            try {
-                const pos = await this.electronAPI.getWindowPosition();
-                if (pos) {
-                    const rect = this.balloon.getBoundingClientRect();
+            const theme = document.documentElement.getAttribute('data-theme');
 
-                    // 吹き出しの最大高さを計算 (app/style.css の max-height: 680px に合わせる)
-                    const maxBalloonHeight = 680;
-                    const balloonWidth = rect.width;
+            // イルカブルー（軽量テーマ）の場合は背景キャプチャをスキップ
+            if (theme === 'dolphin-blue') {
+                this.updateBalloonBackground(null);
+            } else {
+                // 背景キャプチャ処理 (同期的に待機して、自分が写り込まないようにする)
+                try {
+                    const pos = await this.electronAPI.getWindowPosition();
+                    if (pos) {
+                        const rect = this.balloon.getBoundingClientRect();
 
-                    // bottom から bottom: 184px の位置に吹き出しがある
-                    // 最大高さ分の領域をキャプチャ（下揃えで適用するため、上方向に拡張）
-                    const captureRect = {
-                        x: pos.x + rect.left,
-                        y: pos.y + rect.bottom - maxBalloonHeight,
-                        width: balloonWidth,
-                        height: maxBalloonHeight
-                    };
-                    // キャプチャ取得
-                    const bgDataUrl = await this.electronAPI.captureBackground(captureRect);
+                        // 吹き出しの最大高さを計算 (app/style.css の max-height: 680px に合わせる)
+                        const maxBalloonHeight = 680;
+                        const balloonWidth = rect.width;
 
-                    if (bgDataUrl && this.isBalloonOpen) {
-                        this.currentBgDataUrl = bgDataUrl;
-                        this.updateBalloonBackground(bgDataUrl);
+                        // bottom から bottom: 184px の位置に吹き出しがある
+                        // 最大高さ分の領域をキャプチャ（下揃えで適用するため、上方向に拡張）
+                        const captureRect = {
+                            x: pos.x + rect.left,
+                            y: pos.y + rect.bottom - maxBalloonHeight,
+                            width: balloonWidth,
+                            height: maxBalloonHeight
+                        };
+                        // キャプチャ取得
+                        const bgDataUrl = await this.electronAPI.captureBackground(captureRect);
+
+                        if (bgDataUrl && this.isBalloonOpen) {
+                            this.currentBgDataUrl = bgDataUrl;
+                            this.updateBalloonBackground(bgDataUrl);
+                        }
                     }
+                } catch (e) {
+                    console.error("Failed to set frosted background:", e);
+                    // エラー時は何もしない（CSSのデフォルト背景が使われる）
                 }
-            } catch (e) {
-                console.error("Failed to set frosted background:", e);
-                // エラー時は何もしない（CSSのデフォルト背景が使われる）
             }
 
             // キャプチャ完了後に表示クラスを付与
@@ -162,6 +169,17 @@ class DolphinUI {
     }
 
     updateBalloonBackground(bgDataUrl) {
+        const theme = document.documentElement.getAttribute('data-theme');
+
+        if (theme === 'dolphin-blue' || !bgDataUrl) {
+            // 軽量テーマ、または画像がない場合はCSSの背景グラデーションのみを使用
+            this.balloon.style.background = 'var(--balloon-bg)';
+            this.balloon.style.backgroundPosition = '';
+            this.balloon.style.backgroundSize = '';
+            this.balloon.style.backgroundRepeat = '';
+            return;
+        }
+
         // 背景画像を設定 (下揃えで適用)
         // グラデーションはCSS変数 (--glass-overlay) を使うことでテーマ変更時に自動追従させる
         this.balloon.style.background = `
