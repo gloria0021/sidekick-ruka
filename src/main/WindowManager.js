@@ -1,16 +1,18 @@
 const { app, BrowserWindow, screen, Tray, Menu, nativeImage, ipcMain, shell, globalShortcut, nativeTheme } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const { WINDOW_WIDTH, WINDOW_HEIGHT } = require('../shared/constants');
+const { WINDOW_WIDTH, WINDOW_HEIGHT, DEFAULT_SYSTEM_PROMPT } = require('../shared/constants');
 
 class WindowManager {
     constructor() {
         this.mainWindow = null;
+        this.settingsWindow = null;
         this.tray = null;
         this.hasShownOnce = false;
         this.currentFontSize = 'large'; // デフォルト
         this.selectedTheme = 'system'; // デフォルト
         this.copilotKeyMode = false; // デフォルト
+        this.systemInstruction = DEFAULT_SYSTEM_PROMPT; // デフォルト
         this.settingsPath = path.join(app.getPath('userData'), 'settings.json');
 
         this.loadSettings();
@@ -29,6 +31,7 @@ class WindowManager {
                 if (settings.theme) this.selectedTheme = settings.theme;
                 if (settings.fontSize) this.currentFontSize = settings.fontSize;
                 if (settings.hasOwnProperty('copilotKeyMode')) this.copilotKeyMode = settings.copilotKeyMode;
+                if (settings.systemInstruction) this.systemInstruction = settings.systemInstruction;
 
                 // 明示的なテーマ設定がある場合はシステム設定を反映
                 if (this.selectedTheme === 'dark' || this.selectedTheme === 'dolphin-blue') {
@@ -49,7 +52,8 @@ class WindowManager {
             const settings = {
                 theme: this.selectedTheme,
                 fontSize: this.currentFontSize,
-                copilotKeyMode: this.copilotKeyMode
+                copilotKeyMode: this.copilotKeyMode,
+                systemInstruction: this.systemInstruction
             };
             fs.writeFileSync(this.settingsPath, JSON.stringify(settings, null, 2));
         } catch (err) {
@@ -115,6 +119,44 @@ class WindowManager {
         });
 
         this.registerShortcuts();
+    }
+
+    createSettingsWindow() {
+        if (this.settingsWindow) {
+            this.settingsWindow.focus();
+            return;
+        }
+
+        this.settingsWindow = new BrowserWindow({
+            width: 600,
+            height: 700,
+            title: 'ルカの脳内設定',
+            autoHideMenuBar: true,
+            webPreferences: {
+                nodeIntegration: false,
+                contextIsolation: true,
+                preload: path.join(__dirname, '../../preload.js')
+            }
+        });
+
+        this.settingsWindow.loadFile('app/settings.html');
+
+        this.settingsWindow.once('ready-to-show', () => {
+            this.settingsWindow.show();
+            this.settingsWindow.webContents.send('open-prompt-setting', this.systemInstruction);
+        });
+
+        this.settingsWindow.on('closed', () => {
+            this.settingsWindow = null;
+        });
+    }
+
+    showSettingsWindow() {
+        if (this.settingsWindow) {
+            this.settingsWindow.focus();
+        } else {
+            this.createSettingsWindow();
+        }
     }
 
     registerShortcuts() {
@@ -197,7 +239,10 @@ class WindowManager {
 
         const contextMenu = Menu.buildFromTemplate([
             {
-                label: '🐬頭脳（Gemini-3-Flash）'
+                label: '🐬脳内設定（システムプロンプト）',
+                click: () => {
+                    this.showSettingsWindow();
+                }
             },
             {
                 label: '魂を錬成 (Gemini APIキー設定)',

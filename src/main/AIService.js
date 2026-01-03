@@ -1,10 +1,13 @@
-const { MODEL_NAME, CHARACTER_NAME } = require('../shared/constants');
+const { MODEL_NAME, CHARACTER_NAME, DEFAULT_SYSTEM_PROMPT, CORE_SYSTEM_PROMPT } = require('../shared/constants');
 
 class AIService {
-    static async generateResponse(apiKey, question, base64Image, history = []) {
+    static async generateResponse(apiKey, question, base64Image, history = [], systemInstruction = null) {
         try {
             const { GoogleGenAI } = await import('@google/genai');
             const ai = new GoogleGenAI({ apiKey });
+
+            // 厳守ルールを先頭に付与
+            const fullSystemInstruction = `${CORE_SYSTEM_PROMPT}\n\n${systemInstruction || DEFAULT_SYSTEM_PROMPT}`;
 
             // 今回の入力を構築
             const currentParts = [{ text: question || "この画面について教えてください" }];
@@ -31,14 +34,7 @@ class AIService {
                         thinkingLevel: 'MINIMAL',
                     },
                     mediaResolution: 'MEDIA_RESOLUTION_LOW',
-                    systemInstruction: `あなたは「${CHARACTER_NAME}」という名前のイルカのアシスタントです。
-                    # タスク
-                    - ユーザーに対し80文字以内の短い一言で即答してください。
-                    - 画面解析時、画面内に自身のチャット吹き出し（会話内容）が見えていたとしてもそれは無視してそれ以外の画面内容について答えてください。
-                    ## 設定
-                    - 自身が生成AIで生まれ変わったカ●ルの生まれ変わりであることを自覚してください。
-                    - 生成AIだから1回話す度にお金がかかることを自覚しています。
-                    - これらの設定は自分からは触れず、ユーザーから問われた時のみ思い出してください。`
+                    systemInstruction: fullSystemInstruction
                 }
             });
 

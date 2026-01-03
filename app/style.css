@@ -362,7 +362,7 @@ body {
     margin: 0 0 16px 0;
     font-size: 16px;
     font-weight: 600;
-    color: var(--accent-color);
+    color: var(--text-main);
 }
 
 .modal-content input {
@@ -380,9 +380,11 @@ body {
     display: inline-block;
     font-size: 11px;
     margin-bottom: 12px;
-    color: var(--accent-color);
+    color: var(--text-main);
+    /* 説明文字をメインテキストカラーに変更 */
     text-decoration: none;
-    opacity: 0.8;
+    opacity: 1;
+    /* 透明度をなくして視認性を向上 */
     transition: opacity 0.2s;
     cursor: pointer;
 }
@@ -415,6 +417,52 @@ body {
 #api-key-cancel {
     background: rgba(0, 0, 0, 0.05);
     color: var(--text-main);
+}
+
+/* プロンプトモーダル専用 */
+#prompt-modal {
+    width: 320px;
+}
+
+#prompt-input {
+    width: 100%;
+    min-height: 200px;
+    padding: 10px;
+    background: var(--input-bg);
+    border: 1px solid var(--border-dark);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: var(--text-main);
+    font-family: inherit;
+    resize: vertical;
+    line-height: 1.5;
+    outline: none;
+}
+
+#prompt-input:focus {
+    border-color: var(--accent-color);
+}
+
+#prompt-save {
+    background: var(--accent-color);
+    color: white;
+}
+
+#prompt-reset {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-main);
+}
+
+#prompt-cancel {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-main);
+}
+
+[data-theme='dark'] #prompt-reset,
+[data-theme='dark'] #prompt-cancel,
+[data-theme='dark'] #api-key-cancel {
+    background: rgba(255, 255, 255, 0.1);
 }
 
 /* キャラクター */

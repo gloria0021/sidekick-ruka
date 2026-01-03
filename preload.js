@@ -17,6 +17,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onFadeOut: (callback) => ipcRenderer.on('fade-out', () => callback()),
     onPositionReset: (callback) => ipcRenderer.on('position-reset', (event, pos) => callback(pos)),
     onOpenApiKeySetting: (callback) => ipcRenderer.on('open-api-key-setting', () => callback()),
+    onOpenPromptSetting: (callback) => ipcRenderer.on('open-prompt-setting', (event, prompt) => callback(event, prompt)),
+    savePrompt: (prompt) => ipcRenderer.send('save-prompt', prompt),
     onThemeChanged: (callback) => ipcRenderer.on('theme-changed', (event, data) => callback(data)),
     onFontSizeChanged: (callback) => ipcRenderer.on('font-size-changed', (event, size) => callback(size)),
     openExternal: (url) => ipcRenderer.send('open-external', url)
