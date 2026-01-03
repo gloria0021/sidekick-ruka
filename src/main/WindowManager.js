@@ -10,6 +10,7 @@ class WindowManager {
         this.hasShownOnce = false;
         this.currentFontSize = 'large'; // デフォルト
         this.selectedTheme = 'system'; // デフォルト
+        this.copilotKeyMode = false; // デフォルト
         this.settingsPath = path.join(app.getPath('userData'), 'settings.json');
 
         this.loadSettings();
@@ -27,6 +28,7 @@ class WindowManager {
                 const settings = JSON.parse(fs.readFileSync(this.settingsPath, 'utf8'));
                 if (settings.theme) this.selectedTheme = settings.theme;
                 if (settings.fontSize) this.currentFontSize = settings.fontSize;
+                if (settings.hasOwnProperty('copilotKeyMode')) this.copilotKeyMode = settings.copilotKeyMode;
 
                 // 明示的なテーマ設定がある場合はシステム設定を反映
                 if (this.selectedTheme === 'dark' || this.selectedTheme === 'dolphin-blue') {
@@ -46,7 +48,8 @@ class WindowManager {
         try {
             const settings = {
                 theme: this.selectedTheme,
-                fontSize: this.currentFontSize
+                fontSize: this.currentFontSize,
+                copilotKeyMode: this.copilotKeyMode
             };
             fs.writeFileSync(this.settingsPath, JSON.stringify(settings, null, 2));
         } catch (err) {
@@ -196,6 +199,25 @@ class WindowManager {
             {
                 label: '🐬頭脳（Gemini-3-Flash）'
             },
+            {
+                label: '魂を錬成 (Gemini APIキー設定)',
+                click: () => {
+                    if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+                        this.mainWindow.show();
+                        this.mainWindow.webContents.send('open-api-key-setting');
+                    }
+                }
+            },
+            {
+                label: '相談料を表示',
+                type: 'checkbox',
+                checked: true, // TODO: 本来は状態を保持すべきだが、今回は簡易化
+                click: (menuItem) => {
+                    if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+                        this.mainWindow.webContents.send('toggle-cost-display', menuItem.checked);
+                    }
+                }
+            },
             { type: 'separator' },
             {
                 label: '表示設定',
@@ -279,24 +301,13 @@ class WindowManager {
                     }
                 ]
             },
-            { type: 'separator' },
             {
-                label: '相談料を表示',
+                label: 'Copilotキーモード',
                 type: 'checkbox',
-                checked: true, // TODO: 本来は状態を保持すべきだが、今回は簡易化
+                checked: this.copilotKeyMode,
                 click: (menuItem) => {
-                    if (this.mainWindow && !this.mainWindow.isDestroyed()) {
-                        this.mainWindow.webContents.send('toggle-cost-display', menuItem.checked);
-                    }
-                }
-            },
-            {
-                label: '魂を錬成 (Gemini APIキー設定)',
-                click: () => {
-                    if (this.mainWindow && !this.mainWindow.isDestroyed()) {
-                        this.mainWindow.show();
-                        this.mainWindow.webContents.send('open-api-key-setting');
-                    }
+                    this.copilotKeyMode = menuItem.checked;
+                    this.saveSettings();
                 }
             },
             { type: 'separator' },
@@ -355,7 +366,11 @@ class WindowManager {
 
     hide() {
         if (this.mainWindow && !this.mainWindow.isDestroyed()) {
-            this.mainWindow.hide();
+            if (this.copilotKeyMode) {
+                app.quit();
+            } else {
+                this.mainWindow.hide();
+            }
         }
     }
 }
