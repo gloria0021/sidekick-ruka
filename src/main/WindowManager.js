@@ -15,6 +15,9 @@ class WindowManager {
         this.systemInstruction = DEFAULT_SYSTEM_PROMPT; // デフォルト
         this.thinkingLevel = 'MINIMAL'; // デフォルト
         this.googleSearch = false; // デフォルト
+        this.thinkingLevel = 'MINIMAL'; // デフォルト
+        this.googleSearch = false; // デフォルト
+        this.windowPosition = null; // 位置情報
         this.settingsPath = path.join(app.getPath('userData'), 'settings.json');
 
         this.loadSettings();
@@ -35,7 +38,9 @@ class WindowManager {
                 if (settings.hasOwnProperty('copilotKeyMode')) this.copilotKeyMode = settings.copilotKeyMode;
                 if (settings.systemInstruction) this.systemInstruction = settings.systemInstruction;
                 if (settings.thinkingLevel) this.thinkingLevel = settings.thinkingLevel;
+                if (settings.thinkingLevel) this.thinkingLevel = settings.thinkingLevel;
                 if (settings.hasOwnProperty('googleSearch')) this.googleSearch = settings.googleSearch;
+                if (settings.windowPosition) this.windowPosition = settings.windowPosition;
 
                 // 明示的なテーマ設定がある場合はシステム設定を反映
                 if (this.selectedTheme === 'dark' || this.selectedTheme === 'dolphin-blue') {
@@ -59,7 +64,10 @@ class WindowManager {
                 copilotKeyMode: this.copilotKeyMode,
                 systemInstruction: this.systemInstruction,
                 thinkingLevel: this.thinkingLevel,
-                googleSearch: this.googleSearch
+                systemInstruction: this.systemInstruction,
+                thinkingLevel: this.thinkingLevel,
+                googleSearch: this.googleSearch,
+                windowPosition: this.windowPosition
             };
             fs.writeFileSync(this.settingsPath, JSON.stringify(settings, null, 2));
         } catch (err) {
@@ -94,11 +102,22 @@ class WindowManager {
 
         const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
+        // 保存された位置がある場合はそれを使用、なければ右下
+        let x = width - (WINDOW_WIDTH + 20);
+        let y = height - (WINDOW_HEIGHT + 20);
+
+        if (this.windowPosition) {
+            // 画面外に行かないように簡易チェック（必要に応じて強化可能）
+            // ここでは保存された値をそのまま採用しますが、本来はDisplayBounds内かチェック推奨
+            x = this.windowPosition.x;
+            y = this.windowPosition.y;
+        }
+
         this.mainWindow = new BrowserWindow({
             width: WINDOW_WIDTH,
             height: WINDOW_HEIGHT,
-            x: width - (WINDOW_WIDTH + 20),
-            y: height - (WINDOW_HEIGHT + 20),
+            x: x,
+            y: y,
             transparent: true,
             frame: false,
             alwaysOnTop: true,
@@ -421,9 +440,19 @@ class WindowManager {
         return null;
     }
 
+    saveWindowPosition() {
+        if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+            const pos = this.mainWindow.getPosition();
+            this.windowPosition = { x: pos[0], y: pos[1] };
+        }
+    }
+
     hide() {
         if (this.mainWindow && !this.mainWindow.isDestroyed()) {
             if (this.copilotKeyMode) {
+                // アプリ終了前に位置を保存
+                this.saveWindowPosition();
+                this.saveSettings();
                 app.quit();
             } else {
                 this.mainWindow.hide();
