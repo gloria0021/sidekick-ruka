@@ -1,7 +1,7 @@
 const { app, BrowserWindow, screen, Tray, Menu, nativeImage, ipcMain, shell, globalShortcut, nativeTheme } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const { WINDOW_WIDTH, WINDOW_HEIGHT, DEFAULT_SYSTEM_PROMPT } = require('../shared/constants');
+const { WINDOW_WIDTH, WINDOW_HEIGHT, DEFAULT_SYSTEM_PROMPT, DEBUG_FLG } = require('../shared/constants');
 
 class WindowManager {
     constructor() {
@@ -13,6 +13,8 @@ class WindowManager {
         this.selectedTheme = 'system'; // デフォルト
         this.copilotKeyMode = false; // デフォルト
         this.systemInstruction = DEFAULT_SYSTEM_PROMPT; // デフォルト
+        this.thinkingLevel = 'MINIMAL'; // デフォルト
+        this.googleSearch = false; // デフォルト
         this.settingsPath = path.join(app.getPath('userData'), 'settings.json');
 
         this.loadSettings();
@@ -32,6 +34,8 @@ class WindowManager {
                 if (settings.fontSize) this.currentFontSize = settings.fontSize;
                 if (settings.hasOwnProperty('copilotKeyMode')) this.copilotKeyMode = settings.copilotKeyMode;
                 if (settings.systemInstruction) this.systemInstruction = settings.systemInstruction;
+                if (settings.thinkingLevel) this.thinkingLevel = settings.thinkingLevel;
+                if (settings.hasOwnProperty('googleSearch')) this.googleSearch = settings.googleSearch;
 
                 // 明示的なテーマ設定がある場合はシステム設定を反映
                 if (this.selectedTheme === 'dark' || this.selectedTheme === 'dolphin-blue') {
@@ -53,7 +57,9 @@ class WindowManager {
                 theme: this.selectedTheme,
                 fontSize: this.currentFontSize,
                 copilotKeyMode: this.copilotKeyMode,
-                systemInstruction: this.systemInstruction
+                systemInstruction: this.systemInstruction,
+                thinkingLevel: this.thinkingLevel,
+                googleSearch: this.googleSearch
             };
             fs.writeFileSync(this.settingsPath, JSON.stringify(settings, null, 2));
         } catch (err) {
@@ -143,7 +149,11 @@ class WindowManager {
 
         this.settingsWindow.once('ready-to-show', () => {
             this.settingsWindow.show();
-            this.settingsWindow.webContents.send('open-prompt-setting', this.systemInstruction);
+            this.settingsWindow.webContents.send('open-prompt-setting', {
+                prompt: this.systemInstruction,
+                thinkingLevel: this.thinkingLevel,
+                googleSearch: this.googleSearch
+            });
         });
 
         this.settingsWindow.on('closed', () => {
@@ -172,7 +182,9 @@ class WindowManager {
         });
 
         if (!ret) {
-            console.log('Copilot key registration failed. Trying fallback (F23 only)...');
+            if (DEBUG_FLG) {
+                console.log('Copilot key registration failed. Trying fallback (F23 only)...');
+            }
             // フォールバック: F23のみ (一部のマクロ設定用)
             globalShortcut.register('F23', () => {
                 this.handleCopilotKey();

@@ -1,4 +1,5 @@
 module.exports = {
+    DEBUG_FLG: false,
     WINDOW_WIDTH: 400,
     WINDOW_HEIGHT: 1200,
     BALLOON_OFFSET_BOTTOM: 184,

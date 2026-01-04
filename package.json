@@ -6,7 +6,7 @@
   "license": "ISC",
   "description": "AI Dolphin Assistant 'Luka'",
   "scripts": {
-    "start": "electron .",
+    "start": "chcp 65001 && electron .",
     "dist": "electron-builder --win",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

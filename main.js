@@ -45,14 +45,18 @@ if (!hasLock) {
     ipcMain.handle('generate-ai-response', async (event, { apiKey, question, base64Image, history }) => {
         try {
             const systemInstruction = windowManager.systemInstruction;
-            return await AIService.generateResponse(apiKey, question, base64Image, history, systemInstruction);
+            const thinkingLevel = windowManager.thinkingLevel;
+            const googleSearch = windowManager.googleSearch;
+            return await AIService.generateResponse(apiKey, question, base64Image, history, systemInstruction, thinkingLevel, googleSearch);
         } catch (err) {
             return { error: err.message || err.toString() };
         }
     });
 
-    ipcMain.on('save-prompt', (event, prompt) => {
-        windowManager.systemInstruction = prompt;
+    ipcMain.on('save-prompt', (event, { prompt, thinkingLevel, googleSearch }) => {
+        if (prompt !== undefined) windowManager.systemInstruction = prompt;
+        if (thinkingLevel !== undefined) windowManager.thinkingLevel = thinkingLevel;
+        if (googleSearch !== undefined) windowManager.googleSearch = googleSearch;
         windowManager.saveSettings();
     });
 

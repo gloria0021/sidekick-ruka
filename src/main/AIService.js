@@ -1,7 +1,7 @@
-const { MODEL_NAME, CHARACTER_NAME, DEFAULT_SYSTEM_PROMPT, CORE_SYSTEM_PROMPT } = require('../shared/constants');
+const { MODEL_NAME, CHARACTER_NAME, DEFAULT_SYSTEM_PROMPT, CORE_SYSTEM_PROMPT, DEBUG_FLG } = require('../shared/constants');
 
 class AIService {
-    static async generateResponse(apiKey, question, base64Image, history = [], systemInstruction = null) {
+    static async generateResponse(apiKey, question, base64Image, history = [], systemInstruction = null, thinkingLevel = 'MINIMAL', googleSearch = false) {
         try {
             const { GoogleGenAI } = await import('@google/genai');
             const ai = new GoogleGenAI({ apiKey });
@@ -26,17 +26,38 @@ class AIService {
                 { role: 'user', parts: currentParts }
             ];
 
-            const result = await ai.models.generateContent({
+            const tools = [];
+            if (googleSearch) {
+                tools.push({ googleSearch: {} });
+            }
+
+            const request = {
                 model: MODEL_NAME,
                 contents,
                 config: {
                     thinkingConfig: {
-                        thinkingLevel: 'MINIMAL',
+                        thinkingLevel: thinkingLevel || 'MINIMAL',
                     },
-                    mediaResolution: 'MEDIA_RESOLUTION_LOW',
+                    tools: tools.length > 0 ? tools : undefined,
+                    mediaResolution: 'MEDIA_RESOLUTION_MEDIUM',
                     systemInstruction: fullSystemInstruction
                 }
-            });
+            };
+
+            // 実際に投げられるJSONをデバッグ出力
+            if (DEBUG_FLG) {
+                console.log("--- AI API Request (JSON) ---");
+                console.log(JSON.stringify(request, (key, value) => {
+                    // 画像（base64）は長すぎてログを埋め尽くすので省略
+                    if (key === 'data' && typeof value === 'string' && value.length > 100) {
+                        return value.substring(0, 20) + "...(truncated)";
+                    }
+                    return value;
+                }, 2));
+                console.log("-----------------------------");
+            }
+
+            const result = await ai.models.generateContent(request);
 
             const text = result.response?.text?.() ||
                 (result.candidates && result.candidates[0]?.content?.parts[0]?.text) ||
