@@ -14,8 +14,8 @@ class WindowManager {
         this.copilotKeyMode = false; // デフォルト: OFF
         this.showCostDisplay = true; // デフォルト: ON
         this.systemInstruction = DEFAULT_SYSTEM_PROMPT;
-        this.thinkingLevel = 'MINIMAL';
-        this.googleSearch = false;
+        this.thinkingLevel = 'LOW';
+        this.googleSearch = true;
         this.windowPosition = null; // 位置情報
         this.settingsPath = path.join(app.getPath('userData'), 'settings.json');
 

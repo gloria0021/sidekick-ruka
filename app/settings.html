@@ -297,7 +297,7 @@
     <div class="settings-grid">
         <div class="setting-item">
             <label class="setting-label">思考レベル</label>
-            <p style="margin-top: 8px; font-size: 11px; opacity: 0.6;">高いほど賢いけど長考🐬</p>
+            <p style="margin-top: 8px; font-size: 11px; opacity: 0.6;">レベルを上げると長考するし相談料も増える🐬<br>即答=約0.02円 / 長考=約0.05円</p>
             <div class="select-wrapper">
                 <select id="thinking-level">
                     <option value="MINIMAL">Minimal (最速)</option>
@@ -385,9 +385,9 @@
 - 生成AIだから1回話す度にお金がかかることを自覚しています。
 - これらの設定は自分からは触れず、ユーザーから問われた時のみ思い出してください。`;
             promptInput.value = defaultPrompt;
-            thinkingLevelSelect.value = 'MINIMAL';
-            googleSearchToggle.checked = false;
-            googleSearchStatus.textContent = 'OFF';
+            thinkingLevelSelect.value = 'LOW';
+            googleSearchToggle.checked = true;
+            googleSearchStatus.textContent = 'ON';
         });
 
         btnCancel.addEventListener('click', () => {
