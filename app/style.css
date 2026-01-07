@@ -102,6 +102,27 @@
     --glass-overlay: linear-gradient(135deg, rgba(25, 37, 233, 0.85) 0%, rgba(7, 62, 207, 0.85) 100%);
 }
 
+[data-theme='classic'] {
+    --accent-color: #000000;
+    --bg-mica: #FEFECA;
+    --border-light: #000000;
+    --border-dark: #000000;
+    --text-main: #000000;
+    --text-secondary: #333333;
+    --radius: 4px;
+    --balloon-bg: #FEFECA;
+    --balloon-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
+    --input-bg: #ffffff;
+    --user-q-bg: rgba(0, 0, 0, 0.05);
+    --modal-bg: #FEFECA;
+    --glass-overlay: none;
+    font-family: 'MS Gothic', 'ＭＳ ゴシック', 'MS UI Gothic', sans-serif !important;
+}
+
+[data-theme='classic'] * {
+    font-family: inherit !important;
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -139,17 +160,20 @@ body {
     width: 340px;
     max-width: 400px;
     max-height: 680px;
-    /* bottom(184px) + height(680px) = 864px。WINDOW_HEIGHT(1200px)の中に広大な余裕を持って収まる */
     display: flex;
     flex-direction: column;
-    /* 上から下へ */
     overflow: hidden;
-    /* 角丸を維持してスクロールするために必須 */
     opacity: 0;
     transform: scale(0.95) translateY(10px);
     transition: all 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
     pointer-events: none;
     z-index: 100;
+}
+
+[data-theme='classic'] #balloon {
+    backdrop-filter: none !important;
+    background-image: none !important;
+    border-color: #000000 !important;
 }
 
 #balloon.active {
@@ -231,6 +255,7 @@ body {
     font-weight: 400;
     opacity: 0.8;
     white-space: nowrap;
+    text-align: right !important;
 }
 
 .footer-left {
@@ -306,6 +331,26 @@ body {
     overflow-y: auto;
     outline: none;
     transition: background 0.2s, border-color 0.2s;
+}
+
+[data-theme='classic'] #user-input {
+    border-color: #7a7a7a !important;
+    border-bottom: 1px solid #7a7a7a !important;
+    border-radius: 0;
+}
+
+[data-theme='classic'] #send-btn,
+[data-theme='classic'] #reset-btn {
+    background: #FEFECA;
+    color: #000000;
+    border: 1px solid #7a7a7a;
+    border-radius: 4px;
+    box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='classic'] #send-btn:hover,
+[data-theme='classic'] #reset-btn:hover {
+    background: #ffffda;
 }
 
 #user-input:focus {

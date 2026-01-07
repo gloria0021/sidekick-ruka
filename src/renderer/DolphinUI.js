@@ -137,7 +137,7 @@ class DolphinUI {
 
     async setupBackground() {
         const theme = document.documentElement.getAttribute('data-theme');
-        if (theme === 'dolphin-blue') {
+        if (theme === 'dolphin-blue' || theme === 'classic') {
             this.updateBalloonBackground(null);
             return;
         }
@@ -171,7 +171,7 @@ class DolphinUI {
     updateBalloonBackground(bgDataUrl) {
         const theme = document.documentElement.getAttribute('data-theme');
 
-        if (theme === 'dolphin-blue' || !bgDataUrl) {
+        if (theme === 'dolphin-blue' || theme === 'classic' || !bgDataUrl) {
             // 軽量テーマ、または画像がない場合はCSSの背景グラデーションのみを使用
             this.balloon.style.background = 'var(--balloon-bg)';
             this.balloon.style.backgroundPosition = '';

@@ -9,14 +9,13 @@ class WindowManager {
         this.settingsWindow = null;
         this.tray = null;
         this.hasShownOnce = false;
-        this.currentFontSize = 'large'; // デフォルト
-        this.selectedTheme = 'system'; // デフォルト
-        this.copilotKeyMode = false; // デフォルト
-        this.systemInstruction = DEFAULT_SYSTEM_PROMPT; // デフォルト
-        this.thinkingLevel = 'MINIMAL'; // デフォルト
-        this.googleSearch = false; // デフォルト
-        this.thinkingLevel = 'MINIMAL'; // デフォルト
-        this.googleSearch = false; // デフォルト
+        this.currentFontSize = 'medium'; // デフォルト: 中
+        this.selectedTheme = 'classic'; // デフォルト: クラシック
+        this.copilotKeyMode = false; // デフォルト: OFF
+        this.showCostDisplay = true; // デフォルト: ON
+        this.systemInstruction = DEFAULT_SYSTEM_PROMPT;
+        this.thinkingLevel = 'MINIMAL';
+        this.googleSearch = false;
         this.windowPosition = null; // 位置情報
         this.settingsPath = path.join(app.getPath('userData'), 'settings.json');
 
@@ -36,20 +35,21 @@ class WindowManager {
                 if (settings.theme) this.selectedTheme = settings.theme;
                 if (settings.fontSize) this.currentFontSize = settings.fontSize;
                 if (settings.hasOwnProperty('copilotKeyMode')) this.copilotKeyMode = settings.copilotKeyMode;
+                if (settings.hasOwnProperty('showCostDisplay')) this.showCostDisplay = settings.showCostDisplay;
                 if (settings.systemInstruction) this.systemInstruction = settings.systemInstruction;
-                if (settings.thinkingLevel) this.thinkingLevel = settings.thinkingLevel;
                 if (settings.thinkingLevel) this.thinkingLevel = settings.thinkingLevel;
                 if (settings.hasOwnProperty('googleSearch')) this.googleSearch = settings.googleSearch;
                 if (settings.windowPosition) this.windowPosition = settings.windowPosition;
 
-                // 明示的なテーマ設定がある場合はシステム設定を反映
-                if (this.selectedTheme === 'dark' || this.selectedTheme === 'dolphin-blue') {
-                    nativeTheme.themeSource = 'dark';
-                } else if (this.selectedTheme === 'light') {
-                    nativeTheme.themeSource = 'light';
-                } else {
-                    nativeTheme.themeSource = 'system';
-                }
+            }
+
+            // 選ばれたテーマに応じてテーマソースを設定
+            if (this.selectedTheme === 'dark' || this.selectedTheme === 'dolphin-blue') {
+                nativeTheme.themeSource = 'dark';
+            } else if (this.selectedTheme === 'light' || this.selectedTheme === 'classic') {
+                nativeTheme.themeSource = 'light';
+            } else {
+                nativeTheme.themeSource = 'system';
             }
         } catch (err) {
             console.error('Failed to load settings:', err);
@@ -62,8 +62,7 @@ class WindowManager {
                 theme: this.selectedTheme,
                 fontSize: this.currentFontSize,
                 copilotKeyMode: this.copilotKeyMode,
-                systemInstruction: this.systemInstruction,
-                thinkingLevel: this.thinkingLevel,
+                showCostDisplay: this.showCostDisplay,
                 systemInstruction: this.systemInstruction,
                 thinkingLevel: this.thinkingLevel,
                 googleSearch: this.googleSearch,
@@ -137,6 +136,8 @@ class WindowManager {
             // 初回作成時はアニメーションで表示
             this.showWindow();
             this.updateThemeInRenderer();
+            this.updateCostDisplayInRenderer();
+            this.mainWindow.webContents.send('font-size-changed', this.currentFontSize);
         });
 
         this.mainWindow.on('closed', () => {
@@ -287,11 +288,11 @@ class WindowManager {
             {
                 label: '相談料を表示',
                 type: 'checkbox',
-                checked: true, // TODO: 本来は状態を保持すべきだが、今回は簡易化
+                checked: this.showCostDisplay,
                 click: (menuItem) => {
-                    if (this.mainWindow && !this.mainWindow.isDestroyed()) {
-                        this.mainWindow.webContents.send('toggle-cost-display', menuItem.checked);
-                    }
+                    this.showCostDisplay = menuItem.checked;
+                    this.saveSettings();
+                    this.updateCostDisplayInRenderer();
                 }
             },
             { type: 'separator' },
@@ -301,6 +302,31 @@ class WindowManager {
                     {
                         label: 'テーマ設定',
                         submenu: [
+                            {
+                                label: 'クラシック',
+                                type: 'radio',
+                                checked: this.selectedTheme === 'classic',
+                                click: () => {
+                                    this.selectedTheme = 'classic';
+                                    nativeTheme.themeSource = 'light';
+                                    this.saveSettings();
+                                    this.updateTrayMenu();
+                                    this.updateThemeInRenderer();
+                                }
+                            },
+                            {
+                                label: 'モダン',
+                                type: 'radio',
+                                checked: this.selectedTheme === 'dolphin-blue',
+                                click: () => {
+                                    this.selectedTheme = 'dolphin-blue';
+                                    // イルカブルーはベースを系統としてはダーク寄りにする（文字色白など）
+                                    nativeTheme.themeSource = 'dark';
+                                    this.saveSettings();
+                                    this.updateTrayMenu();
+                                    this.updateThemeInRenderer();
+                                }
+                            },
                             {
                                 label: '自動（システム設定）',
                                 type: 'radio',
@@ -331,19 +357,6 @@ class WindowManager {
                                 checked: this.selectedTheme === 'dark',
                                 click: () => {
                                     this.selectedTheme = 'dark';
-                                    nativeTheme.themeSource = 'dark';
-                                    this.saveSettings();
-                                    this.updateTrayMenu();
-                                    this.updateThemeInRenderer();
-                                }
-                            },
-                            {
-                                label: 'イルカブルー',
-                                type: 'radio',
-                                checked: this.selectedTheme === 'dolphin-blue',
-                                click: () => {
-                                    this.selectedTheme = 'dolphin-blue';
-                                    // イルカブルーはベースを系統としてはダーク寄りにする（文字色白など）
                                     nativeTheme.themeSource = 'dark';
                                     this.saveSettings();
                                     this.updateTrayMenu();
@@ -413,6 +426,12 @@ class WindowManager {
                 this.showWindow();
             }
         });
+    }
+
+    updateCostDisplayInRenderer() {
+        if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+            this.mainWindow.webContents.send('toggle-cost-display', this.showCostDisplay);
+        }
     }
 
     send(channel, ...args) {
